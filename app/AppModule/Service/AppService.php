@@ -1,0 +1,29 @@
+<?php
+
+namespace AppModule\Service;
+
+//
+// 
+//
+class AppService implements \Hill\IInjectable
+{
+    /**
+     * @var ConfigService $configService
+     */
+    private $configService;
+    public function __construct(
+        ConfigService $configService
+    ) {
+        $this->configService = $configService;
+    }
+
+    public function sayHello()
+    {
+        return "hello!";
+    }
+
+    public function getSomePropertyValue()
+    {
+        return $this->configService->getProperty("some");
+    }
+}
