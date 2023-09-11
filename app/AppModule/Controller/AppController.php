@@ -52,8 +52,6 @@ class AppController extends Controller implements \Hill\IController
     {
         $query = $request->query;
 
-        var_dump($query);
-
         $this->send(new Response(
             $this->appService->sayHello()
         ));
