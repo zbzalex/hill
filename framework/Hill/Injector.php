@@ -28,7 +28,7 @@ class Injector
     ) {
         if ($wrapper->instance !== null)
             return $wrapper->instance;
-
+        
         $providers = $this->module->getProviders();
 
         try {

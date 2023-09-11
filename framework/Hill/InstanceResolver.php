@@ -41,9 +41,19 @@ class InstanceResolver
 
         $unresolvedInstances_ = $this->module->getUnresolvedInstances();
         foreach ($unresolvedInstances as $unresolvedClass) {
+
+            if (!is_string($unresolvedClass)) {
+                
+                if (is_callable($unresolvedClass)) {
+                    $resolvedInstances[] = $unresolvedClass;
+                }
+
+                continue;
+            }
+
             if (isset($unresolvedInstances_[$unresolvedClass]))
                 continue;
-            
+
             $this->module->addUnresolvedInstance($unresolvedClass);
         }
 

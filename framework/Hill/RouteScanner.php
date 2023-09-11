@@ -85,7 +85,7 @@ class RouteScanner
                 $instanceResolver->registerAndResolveUnresolvedInstances($map->pipes),
                 $instanceResolver->registerAndResolveUnresolvedInstances($map->guards)
             );
-
+            
             $route->compile();
 
             $this->routes[] = $route;
