@@ -42,6 +42,13 @@ class AppModule implements
     public static function importModules()
     {
         return [
+            \DatabaseModule\DatabaseModule::create([
+                'type' => 'mysql',
+                'host' => 'localhost',
+                'username' => 'root',
+                'password' => '123',
+                'database' => 'johncms'
+            ]),
             \ForumModule\ForumModule::class,
         ];
     }

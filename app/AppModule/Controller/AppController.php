@@ -32,7 +32,7 @@ class AppController extends Controller implements \Hill\IController
     {
         return "/";
     }
-    
+
     /**
      * 
      */
@@ -52,9 +52,7 @@ class AppController extends Controller implements \Hill\IController
     {
         $query = $request->query;
 
-        $this->send(new Response(
-            $this->appService->sayHello()
-        ));
+        $this->sendText($this->appService->sayHello());
     }
 
     public function profile($request)

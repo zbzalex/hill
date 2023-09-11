@@ -77,7 +77,7 @@ class Request
     {
         return new Request(
             $_SERVER['REQUEST_METHOD'],
-            rtrim(str_replace('@', '%40', $_SERVER['REQUEST_URI']), "/"),
+            rtrim(str_replace('@', '%40', $_SERVER['REQUEST_URI']), "/") . "/",
             self::resolveGlobalHeaders(),
             $_GET,
             $_POST,
