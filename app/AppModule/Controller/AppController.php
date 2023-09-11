@@ -3,6 +3,7 @@
 namespace AppModule\Controller;
 
 use AppModule\Guard\AuthGuard;
+use AppModule\Pipe\IntParam;
 use AppModule\Service\AppService;
 use Hill\Controller;
 use Hill\RequestMapping;
@@ -42,7 +43,9 @@ class AppController extends Controller implements \Hill\IController
             new RequestMapping(RequestMethod::GET, '/', 'home', [], [
                 AuthGuard::class,
             ]),
-            new RequestMapping(RequestMethod::GET, '/profile/:id', 'profile', [], [
+            new RequestMapping(RequestMethod::GET, '/profile/:id', 'profile', [
+                new IntParam('id'),
+            ], [
                 AuthGuard::class
             ]),
         ];
@@ -57,6 +60,7 @@ class AppController extends Controller implements \Hill\IController
 
     public function profile($request)
     {
+        /** @var int id */
         $id = $request->attributes['id'];
 
         $this->send(new Response(
