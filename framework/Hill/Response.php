@@ -88,8 +88,14 @@ class Response
         511 => 'Network Authentication Required',
     ];
 
+    /**
+     * 
+     */
     private $status = 200;
 
+    /**
+     * 
+     */
     private $sent = false;
 
     /**
@@ -99,7 +105,6 @@ class Response
     {
         $this->body = $body;
         $this->headers = $headers;
-        $this->cookies = [];
     }
 
     public function status($code = null)

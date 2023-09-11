@@ -54,7 +54,8 @@ class Application
         $this->routes = $this->routeScanner->scan($this->basePath);
     }
 
-    public function run() {
+    public function run()
+    {
         $this->handleRequest();
     }
 
@@ -68,50 +69,43 @@ class Application
             ? Request::createFromGlobals()
             : $request;
 
+        $routeMatcher = new RouteMatcher($this->routes);
+
         $response = null;
         try {
+            $route = $routeMatcher->match($request);
 
-            // match route
+            if ($route === null)
+                throw new HttpException("Not Found", 404);
 
-            foreach ($this->routes as $route) {
-                if ($route->getRequestMethod() != $request->method)
-                    continue;
+            $controller = $route->getController();
 
-                if (!preg_match($route->getCompiledPath(), $request->uri, $matches))
-                    continue;
+            try {
+                $reflectionClass = new \ReflectionClass($controller[0]);
+                $reflectionMethod = $reflectionClass->getMethod($controller[1]);
 
-                if (count($route->getArgs()) != 0) {
-                    foreach ($route->getArgs() as $arg) {
-                        $request->attributes[$arg] = $matches[$arg];
+                // call guards
+                foreach ($route->getGuards() as $guard) {
+                    if (!$guard($request)) {
+                        throw new HttpException("Bad request", 400);
                     }
                 }
 
-                $controller = $route->getController();
-                
-                try {
-                    $reflectionClass = new \ReflectionClass($controller[0]);
-                    $reflectionMethod = $reflectionClass->getMethod($controller[1]);
-                    
-                    // call guards
-                    foreach ($route->getGuards() as $guard) {
-                        if (!$guard($request)) {
-                            throw new Result(new Response(null));
-                        }
-                    }
-
-                    // call pipes
-                    foreach ($route->getPipes() as $pipe) {
-                        $pipe($request);
-                    }
-
-                    $reflectionMethod->invokeArgs($controller[0], [
-                        $request
-                    ]);
-                } catch (\ReflectionException $e) {
+                // call pipes
+                foreach ($route->getPipes() as $pipe) {
+                    $pipe($request);
                 }
+
+                $reflectionMethod->invokeArgs($controller[0], [
+                    $request
+                ]);
+            } catch (\ReflectionException $e) {
             }
         } catch (Result $result) {
             $response = $result->getResponse();
+        } catch (HttpException $e) {
+            $response = new Response(null);
+            $response->status($e->getCode());
         }
 
         if ($response !== null) {

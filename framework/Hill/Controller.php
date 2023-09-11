@@ -30,4 +30,12 @@ abstract class Controller
     {
         $this->send(new Response($text));
     }
+    
+    /**
+     * @throws HttpException
+     */
+    public function httpException($message = "", $code = 0)
+    {
+        throw new HttpException($message, $code);
+    }
 }
