@@ -2,13 +2,15 @@
 
 namespace ForumModule\Service;
 
-class ForumService implements \Hill\IInjectable {
-    private $appService;
-    public function __construct(\AppModule\Service\AppService $appService) {
-        $this->appService = $appService;
+class ForumService implements \Hill\IInjectable
+{
+    public function __construct(
+        \DatabaseModule\Service\ConfigService $configService
+    ) {
+        
     }
 
-    public function sayHello() {
-        return $this->appService->sayHello();
+    public function sayHello()
+    {
     }
 }

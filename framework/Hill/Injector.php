@@ -29,11 +29,16 @@ class Injector
         if ($wrapper->instance !== null)
             return $wrapper->instance;
         
+        if ($wrapper->factory !== null) {
+            $wrapper->instance = call_user_func_array($wrapper->factory[0], $wrapper->factory[1]);
+
+            return $wrapper->instance;
+        }
+
         $providers = $this->module->getProviders();
 
         try {
             $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
-
             $constructor = $reflectionClass->getConstructor();
             if ($constructor !== null) {
                 $constructorParams = $constructor->getParameters();
@@ -42,7 +47,7 @@ class Injector
                 } else {
 
                     $args = [];
-                    
+
                     foreach ($constructorParams as $param) {
                         $paramClass = $param->getClass()->getName();
 

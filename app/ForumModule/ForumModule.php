@@ -2,46 +2,23 @@
 
 namespace ForumModule;
 
-use AppModule\Service\AppService;
-use AppModule\Service\ConfigService;
+use DatabaseModule\DatabaseModule;
 
 class ForumModule implements \Hill\IModule
 {
-    // @@@ \Hill\IModule
-    /**
-     * @return string[]
-     */
-    public static function controllers()
+    public static function create(array $options = [])
     {
         return [
-            \ForumModule\Controller\ForumController::class
+            'moduleClass' => ForumModule::class,
+            'controllers' => [
+                \ForumModule\Controller\ForumController::class,
+            ],
+            'providers' => [
+                \ForumModule\Service\ForumService::class,
+            ],
+            'importModules' => [
+                \DatabaseModule\DatabaseModule::class,
+            ]
         ];
-    }
-
-    // @@@ \Hill\IModule
-    /**
-     * @return string[]
-     */
-    public static function providers()
-    {
-        return [
-            \ForumModule\Service\ForumService::class,
-        ];
-    }
-
-    // @@@ \Hill\IModule
-    /**
-     * @return string[]
-     */
-    public static function importModules()
-    {
-        return [
-            \AppModule\AppModule::class,
-        ];
-    }
-
-    public static function exportProviders()
-    {
-        return [];
     }
 }

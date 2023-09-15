@@ -23,12 +23,12 @@ class Container
     /**
      * 
      */
-    public function addModule($moduleClass)
+    public function addModule($moduleClass, array $config = [])
     {
         try {
             $reflectionClass = new \ReflectionClass($moduleClass);
             if ($reflectionClass->implementsInterface(IModule::class)) {
-                $module = new Module($moduleClass);
+                $module = new Module($moduleClass, $config);
 
                 $this->modules[$moduleClass] = $module;
 
@@ -49,7 +49,7 @@ class Container
     }
 
     /**
-     * 
+     * @return Module
      */
     public function get($moduleClass)
     {

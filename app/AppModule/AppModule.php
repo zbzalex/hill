@@ -8,55 +8,31 @@ namespace AppModule;
 class AppModule implements
     \Hill\IModule
 {
-    public function __construct()
-    {
-    }
-    
-    // @@@ \Hill\IModule
-    /**
-     * @return string[]
-     */
-    public static function controllers()
+    public static function create(array $options = [])
     {
         return [
-            \AppModule\Controller\AppController::class,
-        ];
-    }
-
-    // @@@ \Hill\IModule
-    /**
-     * @return string[]
-     */
-    public static function providers()
-    {
-        return [
-            \AppModule\Service\ConfigService::class,
-            \AppModule\Service\AppService::class,
-        ];
-    }
-
-    // @@@ \Hill\IModule
-    /**
-     * @return string[]
-     */
-    public static function importModules()
-    {
-        return [
-            \DatabaseModule\DatabaseModule::create([
-                'type' => 'mysql',
-                'host' => 'localhost',
-                'username' => 'root',
-                'password' => '123',
-                'database' => 'johncms'
-            ]),
-            \ForumModule\ForumModule::class,
-        ];
-    }
-
-    public static function exportProviders()
-    {
-        return [
-            \AppModule\Service\AppService::class,
+            'moduleClass' => AppModule::class,
+            'controllers' => [
+                \AppModule\Controller\AppController::class,
+            ],
+            'importModules'    => [
+                \DatabaseModule\DatabaseModule::create([
+                    'type' => 'mysql',
+                    'host' => 'localhost',
+                    'username' => 'root',
+                    'password' => '123',
+                    'database' => 'johncms'
+                ]),
+                \ForumModule\ForumModule::class,
+            ],
+            'providers' => [
+                \AppModule\Service\ConfigService::class,
+                \AppModule\Service\AppService::class,
+            ],
+            'exportProviders' => [
+                \AppModule\Service\ConfigService::class,
+                \AppModule\Service\AppService::class,
+            ]
         ];
     }
 }
