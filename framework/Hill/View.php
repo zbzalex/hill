@@ -19,7 +19,9 @@ class View
 
     public function get($key)
     {
-        return $this->vars[$key] ?? null;
+        return isset($this->vars[$key])
+            ? $this->vars[$key]
+            : null;
     }
 
     public function set($key, $value = null)
@@ -47,7 +49,7 @@ class View
         }
     }
 
-    public function render($file, $data = null)
+    public function render($file, array $data = [])
     {
         $this->template = $this->getTemplate($file);
 
@@ -64,7 +66,7 @@ class View
         include $this->template;
     }
 
-    public function fetch($file, $data = null)
+    public function fetch($file, array $data = [])
     {
         ob_start();
 

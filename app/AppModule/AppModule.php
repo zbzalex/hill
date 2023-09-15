@@ -41,6 +41,7 @@ class AppModule implements
                     ]
                 ],
                 \AppModule\Service\AppService::class,
+                \AppModule\Service\RenderService::class,
             ],
             'exportProviders' => [
                 \AppModule\Service\ConfigService::class,

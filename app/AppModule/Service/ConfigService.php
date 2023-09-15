@@ -13,8 +13,8 @@ class ConfigService
         $this->options = $options;
     }
     
-    public function getProperty($key, $default = null)
+    public function getOptions()
     {
-        return isset($this->options[$key]) ? $this->options[$key] : $default;
+        return $this->options;
     }
 }

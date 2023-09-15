@@ -12,6 +12,10 @@ class InstallModule implements \Hill\IModule {
             'controllers' => [
                 \InstallModule\Controller\InstallController::class,
             ],
+            'importModules' => [
+                \DatabaseModule\DatabaseModule::class,
+                \AppModule\AppModule::class,
+            ],
         ];
     }
 }
