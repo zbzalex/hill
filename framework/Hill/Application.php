@@ -30,12 +30,24 @@ class Application
     /**
      * 
      */
+    private $errorHandler;
+
+    /**
+     * 
+     */
     public function __construct(
         Container $container
     ) {
         $this->container = $container;
         $this->routeScanner = new RouteScanner($container);
         $this->routes = [];
+        $this->errorHandler = function(HttpException $e) {
+            $response = new Response(null);
+            
+            $response->status($e->getCode());
+
+            return $response;
+        };
     }
 
     /**
@@ -44,6 +56,10 @@ class Application
     public function setBasePath($path)
     {
         $this->basePath = $path;
+    }
+
+    public function setErrorHandler($handler) {
+        $this->errorHandler = $handler;
     }
 
     /**
@@ -104,8 +120,9 @@ class Application
         } catch (Result $result) {
             $response = $result->getResponse();
         } catch (HttpException $e) {
-            $response = new Response(null);
-            $response->status($e->getCode());
+            $response = call_user_func_array($this->errorHandler, [
+                $e
+            ]);
         }
 
         if ($response !== null) {

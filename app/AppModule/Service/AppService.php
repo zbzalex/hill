@@ -25,9 +25,4 @@ class AppService implements \Hill\IInjectable
     {
         return "hello!";
     }
-
-    public function getSomePropertyValue()
-    {
-        return $this->configService->getProperty("some");
-    }
 }

@@ -5,7 +5,7 @@ namespace ForumModule\Service;
 class ForumService implements \Hill\IInjectable
 {
     public function __construct(
-        \DatabaseModule\Service\ConfigService $configService
+        \DatabaseModule\Service\DatabaseService $databaseService
     ) {
         
     }

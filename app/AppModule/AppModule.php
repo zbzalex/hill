@@ -2,6 +2,8 @@
 
 namespace AppModule;
 
+use AppModule\Service\ConfigService;
+
 //
 //
 //
@@ -23,10 +25,21 @@ class AppModule implements
                     'password' => '123',
                     'database' => 'johncms'
                 ]),
+                \InstallModule\InstallModule::class,
                 \ForumModule\ForumModule::class,
             ],
             'providers' => [
-                \AppModule\Service\ConfigService::class,
+                [
+                    'providerClass' => \AppModule\Service\ConfigService::class,
+                    'factory' => [
+                        function($options) {
+                            return new ConfigService($options);
+                        },
+                        [
+                            $options
+                        ]
+                    ]
+                ],
                 \AppModule\Service\AppService::class,
             ],
             'exportProviders' => [
