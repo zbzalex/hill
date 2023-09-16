@@ -8,12 +8,12 @@ namespace Hill;
 class Container
 {
     /**
-     * @var array
+     * @var Module[]
      */
     private $modules;
 
     /**
-     * 
+     * Constructor
      */
     public function __construct()
     {
@@ -21,7 +21,10 @@ class Container
     }
 
     /**
+     * @param string $moduleClass
+     * @param array $config
      * 
+     * @return Module|null
      */
     public function addModule($moduleClass, array $config = [])
     {
@@ -49,6 +52,8 @@ class Container
     }
 
     /**
+     * @param string $moduleClass
+     * 
      * @return Module
      */
     public function get($moduleClass)

@@ -18,13 +18,13 @@ class Reflector
                 if (count($constructorParams) != 0) {
                     $args = [];
                     foreach ($constructorParams as $param) {
-                        if (!is_string($param)) {
-                            $args[] = null;
+                        
+                        if (version_compare(phpversion(), '5.6.0', '>')) {
+                            $args[] = $param->getType()->getName();
                         } else {
-                            $paramClass = $param->getClass()->getName();
-
-                            $args[] = $paramClass;
+                            $args[] = $param->getClass()->getName();
                         }
+
                     }
 
                     return $args;

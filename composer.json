@@ -1,0 +1,16 @@
+{
+    "name": "zbzalex/hill-php",
+    "type": "library",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Hill\\": "framework/Hill/"
+        }
+    },
+    "autoload-dev": {
+        "Tests\\": "tests/"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.4@dev"
+    }
+}

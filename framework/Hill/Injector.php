@@ -8,12 +8,12 @@ namespace Hill;
 class Injector
 {
     /**
-     * 
+     * @var Module $module
      */
     private $module;
 
     /**
-     * 
+     * @param Module $module
      */
     public function __construct(Module $module)
     {
@@ -21,17 +21,23 @@ class Injector
     }
 
     /**
+     * @param InstanceWrapper $wrapper
      * 
+     * @return object|null
      */
     public function resolveInstance(
         InstanceWrapper $wrapper
     ) {
         if ($wrapper->instance !== null)
             return $wrapper->instance;
-        
-        if ($wrapper->factory !== null) {
-            $wrapper->instance = call_user_func_array($wrapper->factory[0], $wrapper->factory[1]);
 
+        if ($wrapper->factory !== null) {
+            if (count($wrapper->factory) != 2)
+                throw new \Exception(
+                    sprintf("Invalid argument count in factory function")
+                );
+
+            $wrapper->instance = call_user_func_array($wrapper->factory[0], $wrapper->factory[1]);
             return $wrapper->instance;
         }
 
@@ -49,7 +55,12 @@ class Injector
                     $args = [];
 
                     foreach ($constructorParams as $param) {
-                        $paramClass = $param->getClass()->getName();
+
+                        if (version_compare(phpversion(), '5.6.0', '>')) {
+                            $paramClass = $param->getType()->getName();
+                        } else {
+                            $paramClass = $param->getClass()->getName();
+                        }
 
                         if (!isset($providers[$paramClass])) {
                             throw new \Exception(sprintf("Unresolved instance '%s' in module '%s'", $paramClass, $this->module->getModuleClass()));
@@ -74,6 +85,11 @@ class Injector
         return null;
     }
 
+    /**
+     * @param string $someClass
+     * 
+     * @return bool
+     */
     public static function isInjectable($someClass)
     {
         try {
