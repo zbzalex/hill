@@ -155,9 +155,9 @@ class Response
      */
     public function send()
     {
-        // if (ob_get_length() > 0) {
-        //     ob_end_clean();
-        // }
+        if (ob_get_length() > 0) {
+            ob_end_clean();
+        }
 
         if (!headers_sent()) {
             header(

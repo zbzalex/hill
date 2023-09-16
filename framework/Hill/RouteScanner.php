@@ -42,19 +42,21 @@ class RouteScanner
             foreach ($controllers as $wrapper) {
                 try {
                     $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
-                    $reflectionMethod = $reflectionClass->getMethod('path');
-                    $controllerBasePath = $reflectionMethod->invoke(null);
-
-                    // убираем с обеих сторон слэш т.к в базовом пути приложения он
-                    // всегда справа есть и добавляем его справа
+                    $config = $reflectionClass->getMethod('getConfig')->invoke(null);
+                    $controllerBasePath = isset($config['path'])
+                        ? $config['path']
+                        : "/";
                     $controllerBasePath = trim($controllerBasePath, '/') . "/";
-
-                    $reflectionMethod = $reflectionClass->getMethod('routes');
-                    $mapping = $reflectionMethod->invoke(null);
-
+                    $mapping = isset($config['mapping'])
+                        ? $config['mapping']
+                        : [];
+                    $guards = isset($config['guards'])
+                        ? $config['guards']
+                        : [];
+                    
                     $path = rtrim($basePath . $controllerBasePath, "/") . "/";
 
-                    $this->registerRoutes($instanceResolver, $wrapper, $path, $mapping);
+                    $this->registerRoutes($instanceResolver, $wrapper, $path, $mapping, $guards);
                 } catch (\ReflectionException $e) {
                 }
             }
@@ -66,10 +68,14 @@ class RouteScanner
     /**
      * @param InstanceResolver $instanceResolver
      */
-    private function registerRoutes($instanceResolver, $wrapper, $basePath, array $mapping)
-    {
+    private function registerRoutes(
+        $instanceResolver,
+        $wrapper,
+        $basePath,
+        array $mapping,
+        array $guards
+    ) {
         foreach ($mapping as $map) {
-
             $path = $basePath . trim($map->path, '/');
             if ($path != "/") {
                 $path = rtrim($path, "/");
@@ -83,9 +89,12 @@ class RouteScanner
                     $map->action
                 ],
                 $instanceResolver->registerAndResolveUnresolvedInstances($map->pipes),
-                $instanceResolver->registerAndResolveUnresolvedInstances($map->guards)
+                $instanceResolver->registerAndResolveUnresolvedInstances(array_merge(
+                    $map->guards,
+                    $guards
+                ))
             );
-            
+
             $route->compile();
 
             $this->routes[] = $route;

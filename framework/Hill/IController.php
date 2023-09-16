@@ -7,12 +7,7 @@ namespace Hill;
 //
 interface IController {
     /**
-     * @return string
+     * @return array
      */
-    public static function path();
-
-    /**
-     * @return RequestMapping[]
-     */
-    public static function routes();
+    public static function getConfig();
 }
