@@ -42,7 +42,7 @@ class Request
      * 
      */
     public function __construct(
-        $method = RequestMethod::GET,
+        $method,
         $uri,
         array $headers = [],
         array $query = [],
