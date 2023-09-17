@@ -28,19 +28,11 @@ class Container
      */
     public function addModule($moduleClass, array $config = [])
     {
-        try {
-            $reflectionClass = new \ReflectionClass($moduleClass);
-            if ($reflectionClass->implementsInterface(IModule::class)) {
-                $module = new Module($moduleClass, $config);
+        $module = new Module($moduleClass, $config);
+        
+        $this->modules[$moduleClass] = $module;
 
-                $this->modules[$moduleClass] = $module;
-
-                return $module;
-            }
-        } catch (\ReflectionException $e) {
-        }
-
-        return null;
+        return $module;
     }
 
     /**

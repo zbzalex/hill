@@ -9,7 +9,7 @@ class InstanceResolver
 {
     private $module;
     private $injector;
-
+    
     public function __construct(Module $module)
     {
         $this->module = $module;
@@ -35,29 +35,28 @@ class InstanceResolver
      * 
      * @return mixed[]
      */
-    public function registerAndResolveUnresolvedInstances(array $unresolvedInstances)
+    public function registerAndResolveInstances(array $instances)
     {
         $resolvedInstances = [];
 
-        $unresolvedInstances_ = $this->module->getUnresolvedInstances();
-        foreach ($unresolvedInstances as $unresolvedClass) {
-
-            if (!is_string($unresolvedClass)) {
-                
-                if (is_callable($unresolvedClass)) {
-                    $resolvedInstances[] = $unresolvedClass;
+        // $moduleInstances = $this->module->getInstances();
+        
+        foreach ($instances as $instanceClass) {
+            if (!is_string($instanceClass)) {
+                if (is_callable($instanceClass)) {
+                    $resolvedInstances[] = $instanceClass;
                 }
-
                 continue;
             }
 
-            if (isset($unresolvedInstances_[$unresolvedClass]))
-                continue;
+            // if (isset($moduleInstances[$instanceClass]))
+            //     continue;
 
-            $this->module->addUnresolvedInstance($unresolvedClass);
+            $this->module->addInstance($instanceClass);
         }
 
-        foreach ($this->module->getUnresolvedInstances() as $wrapper) {
+        // resolve module instances
+        foreach ($this->module->getInstances() as $wrapper) {
             $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
         }
 

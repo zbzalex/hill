@@ -10,17 +10,10 @@ class ApplicationFactory
     /**
      * @return Application
      */
-    public static function create($rootModuleConfigOrClass, $basePath = "/")
+    public static function create($moduleConfigOrClass, $basePath = "/")
     {
-        $container = new Container();
-        $dependencyScanner = new DependencyScanner($container);
-        $dependencyScanner->scan($rootModuleConfigOrClass);
-
-        $modules = $container->getModules();
-        foreach ($modules as $module) {
-            $instanceResolver = new InstanceResolver($module);
-            $instanceResolver->resolveInstances();
-        }
+        $compiler = new Compiler($moduleConfigOrClass);
+        $container = $compiler->compile();
 
         $app = new Application($container);
         $app->setBasePath($basePath);

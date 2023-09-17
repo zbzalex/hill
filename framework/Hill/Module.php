@@ -11,11 +11,12 @@ class Module
     private $relatedModules;
     private $controllers;
     private $providers;
-    private $unresolvedInstances;
+    private $instances;
     private $config;
 
     /**
-     * 
+     * @param string $moduleClass
+     * @param array $config
      */
     public function __construct($moduleClass, array $config = [])
     {
@@ -23,7 +24,7 @@ class Module
         $this->relatedModules = [];
         $this->controllers = [];
         $this->providers = [];
-        $this->unresolvedInstances = [];
+        $this->instances = [];
         $this->config = $config;
     }
 
@@ -35,6 +36,9 @@ class Module
         return $this->moduleClass;
     }
 
+    /**
+     * @return array
+     */
     public function getConfig()
     {
         return $this->config;
@@ -67,9 +71,9 @@ class Module
     /**
      * 
      */
-    public function getUnresolvedInstances()
+    public function getInstances()
     {
-        return $this->unresolvedInstances;
+        return $this->instances;
     }
 
     /**
@@ -93,9 +97,9 @@ class Module
     /**
      * 
      */
-    public function addUnresolvedInstance($instanceClass)
+    public function addInstance($instanceClass)
     {
-        $this->unresolvedInstances[$instanceClass] =
+        $this->instances[$instanceClass] =
             new InstanceWrapper($instanceClass);
     }
 
@@ -105,5 +109,12 @@ class Module
     public function addRelatedModule(Module $module)
     {
         $this->relatedModules[$module->getModuleClass()] = $module;
+    }
+    
+    public function get($providerClass)
+    {
+        return isset($this->providers[$providerClass])
+            ? $this->providers[$providerClass]->instance
+            : null;
     }
 }

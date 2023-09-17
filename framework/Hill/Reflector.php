@@ -7,6 +7,9 @@ namespace Hill;
 //
 class Reflector
 {
+    /**
+     * @param string $someClass
+     */
     public static function getConstructorArgs($someClass)
     {
         try {
@@ -18,13 +21,7 @@ class Reflector
                 if (count($constructorParams) != 0) {
                     $args = [];
                     foreach ($constructorParams as $param) {
-                        
-                        if (version_compare(phpversion(), '5.6.0', '>')) {
-                            $args[] = $param->getType()->getName();
-                        } else {
-                            $args[] = $param->getClass()->getName();
-                        }
-
+                        $args[] = $param->getType()->getName();
                     }
 
                     return $args;

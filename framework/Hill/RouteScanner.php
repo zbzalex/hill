@@ -88,8 +88,8 @@ class RouteScanner
                     $wrapper->instance,
                     $map->action
                 ],
-                $instanceResolver->registerAndResolveUnresolvedInstances($map->pipes),
-                $instanceResolver->registerAndResolveUnresolvedInstances(array_merge(
+                $instanceResolver->registerAndResolveInstances($map->pipes),
+                $instanceResolver->registerAndResolveInstances(array_merge(
                     $map->guards,
                     $guards
                 ))

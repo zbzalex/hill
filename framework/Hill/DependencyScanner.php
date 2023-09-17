@@ -13,7 +13,7 @@ class DependencyScanner
     private $container;
 
     /**
-     * 
+     * @param Container $container
      */
     public function __construct(Container $container)
     {
@@ -28,26 +28,34 @@ class DependencyScanner
         $this->scanForModules($rootModuleConfigOrClass);
     }
 
-    private function createModule($moduleClass) {
-        try {
-            $reflectionClass = new \ReflectionClass($moduleClass);
-            if (!$reflectionClass->implementsInterface(\Hill\IModule::class)) {
-                throw new \ReflectionException(
-                    sprintf("Module '%s' must be implements of \Hill\IModule", $moduleClass)
-                );
-            }
-
-            $moduleConfig = $reflectionClass->getMethod('create')->invoke(null);
-
-            return $moduleConfig;
-        } catch (\ReflectionException $e) {
+    /**
+     * @param strint $moduleClass
+     * 
+     * @throws \ReflectionException
+     * 
+     * @return array
+     */
+    private function createModule($moduleClass)
+    {
+        $reflectionClass = new \ReflectionClass($moduleClass);
+        if (!$reflectionClass->implementsInterface(\Hill\IModule::class)) {
+            throw new \ReflectionException(
+                sprintf("Module '%s' must be implements of \Hill\IModule", $moduleClass)
+            );
         }
 
-        return null;
+        $moduleConfig = $reflectionClass->getMethod('create')->invoke(null);
+
+        return $moduleConfig;
     }
 
     /**
+     * @param string|array $moduleConfigOrClass
      * 
+     * @throws \Exception
+     * @throws \ReflectionException
+     * 
+     * @return Module|null
      */
     private function scanForModules($moduleConfigOrClass)
     {
@@ -60,21 +68,23 @@ class DependencyScanner
                 : null;
 
             if ($moduleClass === null)
-                throw new \InvalidArgumentException(
-                    sprintf('Undefined module class!!!')
+                throw new \Exception(
+                    "Where is module class in your module config?"
                 );
         } else {
             $moduleClass = $moduleConfigOrClass;
             if (($moduleConfig = self::createModule($moduleClass)) === null)
-                return null;
+                throw new \Exception(
+                    sprintf("Failed to create module '%s'", $moduleClass)
+                );
         }
 
         if (($module = $this->container->get($moduleClass)) !== null) {
             return $module;
         }
 
-        if (($module = $this->container->addModule($moduleClass, $moduleConfig)) === null)
-            return null;
+        // push module into container
+        $module = $this->container->addModule($moduleClass, $moduleConfig);
 
         $this->scanModuleForDeps($module);
 
@@ -112,7 +122,7 @@ class DependencyScanner
     }
 
     /**
-     * 
+     * @param Module $module
      */
     private function scanModuleForDeps(Module $module)
     {
@@ -146,7 +156,6 @@ class DependencyScanner
                         $factory = $providerConfigOrClass['factory'];
                     } else {
                         $providerClass = $providerConfigOrClass;
-
                         $reflectionClass = new \ReflectionClass($providerClass);
                         if (!$reflectionClass->implementsInterface(IInjectable::class))
                             continue;
@@ -171,6 +180,11 @@ class DependencyScanner
         }
     }
 
+    /**
+     * @param Module $module
+     * @param Module $importModule
+     * @param string $providerClass
+     */
     private function resolveProviderDependencies(Module $module, Module $importModule, $providerClass)
     {
         $providers = $importModule->getProviders();

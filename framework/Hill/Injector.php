@@ -42,7 +42,7 @@ class Injector
         }
 
         $providers = $this->module->getProviders();
-
+        
         try {
             $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
             $constructor = $reflectionClass->getConstructor();
@@ -55,12 +55,7 @@ class Injector
                     $args = [];
 
                     foreach ($constructorParams as $param) {
-
-                        if (version_compare(phpversion(), '5.6.0', '>')) {
-                            $paramClass = $param->getType()->getName();
-                        } else {
-                            $paramClass = $param->getClass()->getName();
-                        }
+                        $paramClass = $param->getType()->getName();
 
                         if (!isset($providers[$paramClass])) {
                             throw new \Exception(sprintf("Unresolved instance '%s' in module '%s'", $paramClass, $this->module->getModuleClass()));
