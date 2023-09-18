@@ -1,6 +1,6 @@
 <?php
 
 $loader = require dirname(__DIR__) . '/vendor/autoload.php';
-$loader->add(null, __DIR__.'/application');
+$loader->add(null, __DIR__.'/src');
 
 return $loader;

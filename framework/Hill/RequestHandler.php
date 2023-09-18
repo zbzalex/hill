@@ -10,7 +10,7 @@ class RequestHandler
     private $matcher;
     private $errorHandler;
 
-    public function __construct(array $routes = [], $errorHandler)
+    public function __construct(array $routes, $errorHandler)
     {
         $this->matcher = new RouteMatcher($routes);
         $this->errorHandler = $errorHandler;
