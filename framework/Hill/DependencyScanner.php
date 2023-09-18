@@ -98,6 +98,9 @@ class DependencyScanner
             if (is_array($importModuleConfigOrClass)) {
                 $importModuleConfig = $importModuleConfigOrClass;
             } else {
+                if ($importModuleConfigOrClass === null)
+                    continue;
+                
                 if (($importModule_ = $this->container->get($importModuleConfigOrClass)) !== null) {
                     $importModuleConfig = $importModule_->getConfig();
                 } else {
@@ -155,6 +158,9 @@ class DependencyScanner
 
                         $factory = $providerConfigOrClass['factory'];
                     } else {
+                        if ($providerConfigOrClass === null)
+                            continue;
+
                         $providerClass = $providerConfigOrClass;
                         $reflectionClass = new \ReflectionClass($providerClass);
                         if (!$reflectionClass->implementsInterface(IInjectable::class))
@@ -167,6 +173,9 @@ class DependencyScanner
             }
 
             foreach ($controllers as $controllerClass) {
+                if ($controllerClass === null)
+                    continue;
+                
                 try {
                     $reflectionClass = new \ReflectionClass($controllerClass);
                     if (!$reflectionClass->implementsInterface(IController::class))
