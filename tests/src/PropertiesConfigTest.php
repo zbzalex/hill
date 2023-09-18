@@ -13,5 +13,14 @@ class PropertiesConfigTest extends \PHPUnit\Framework\TestCase
         $config->load();
 
         $this->assertSame($config->get('db.host'), 'localhost', 'Expected localhost');
+
+        $config->addProperties([
+            'logger.level' => 'debug, warn, error, fatal',
+        ]);
+
+        $generator = new \Hill\PropertiesConfigGenerator($config);
+        $output = $generator->generate();
+
+        // 
     }
 }
