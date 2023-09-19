@@ -21,6 +21,6 @@ class PropertiesConfigTest extends \PHPUnit\Framework\TestCase
         $generator = new \Hill\PropertiesConfigGenerator($config);
         $output = $generator->generate();
 
-        // 
+        $this->assertNotNull($output, 'Expcteced not empty output.');
     }
 }
