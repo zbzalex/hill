@@ -9,7 +9,7 @@ class InstanceResolver
 {
     private $module;
     private $injector;
-    
+
     public function __construct(Module $module)
     {
         $this->module = $module;
@@ -29,37 +29,116 @@ class InstanceResolver
             $this->injector->resolveInstance($controller);
         }
     }
+    
+    /**
+     * @param string[] $instances
+     * 
+     * @return InstanceWrapper[]
+     */
+    public function resolveGuards(array $instances)
+    {
+        $resolvedInstances = [];
+        $guards = $this->module->getGuards();
+        foreach ($instances as $instanceClass) {
+            if (is_callable($instanceClass)) {
+                $resolvedInstances[] = $instanceClass;
+                continue;
+            }
+
+            if (isset($guards[$instanceClass]))
+                continue;
+
+            $this->module->addGuard($instanceClass);
+        }
+
+        foreach ($this->module->getGuards() as $wrapper) {
+            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+        }
+
+        return $resolvedInstances;
+    }
 
     /**
      * @param string[] $instances
      * 
-     * @return mixed[]
+     * @return InstanceWrapper[]
      */
-    public function registerAndResolveInstances(array $instances)
+    public function resolvePipes(array $instances)
     {
         $resolvedInstances = [];
-
-        // $moduleInstances = $this->module->getInstances();
-        
+        $pipes = $this->module->getPipes();
         foreach ($instances as $instanceClass) {
-            if (!is_string($instanceClass)) {
-                if (is_callable($instanceClass)) {
-                    $resolvedInstances[] = $instanceClass;
-                }
+            if (is_callable($instanceClass)) {
+                $resolvedInstances[] = $instanceClass;
                 continue;
             }
 
-            // if (isset($moduleInstances[$instanceClass]))
-            //     continue;
+            if (isset($pipes[$instanceClass]))
+                continue;
 
-            $this->module->addInstance($instanceClass);
+            $this->module->addPipe($instanceClass);
         }
 
-        // resolve module instances
-        foreach ($this->module->getInstances() as $wrapper) {
+        foreach ($this->module->getPipes() as $wrapper) {
             $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
         }
+        
+        return $resolvedInstances;
+    }
 
+    /**
+     * @param string[] $instances
+     * 
+     * @return InstanceWrapper[]
+     */
+    public function resolveMiddlewares(array $instances)
+    {
+        $resolvedInstances = [];
+        $middlewares = $this->module->getMiddlewares();
+        foreach ($instances as $instanceClass) {
+            if (is_callable($instanceClass)) {
+                $resolvedInstances[] = $instanceClass;
+                continue;
+            }
+
+            if (isset($middlewares[$instanceClass]))
+                continue;
+
+            $this->module->addMiddleware($instanceClass);
+        }
+
+        foreach ($this->module->getMiddlewares() as $wrapper) {
+            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+        }
+        
+        return $resolvedInstances;
+    }
+
+    /**
+     * @param string[] $instances
+     * 
+     * @return InstanceWrapper[]
+     */
+    public function resolveInterceptors(array $instances)
+    {
+        $resolvedInstances = [];
+        $interceptors = $this->module->getInterceptors();
+        foreach ($instances as $instanceClass) {
+            if (is_callable($instanceClass)) {
+                $resolvedInstances[] = $instanceClass;
+                continue;
+            }
+
+            if (isset($interceptors[$instanceClass]))
+                continue;
+
+            $this->module->addInterceptor($instanceClass);
+        }
+
+        foreach ($this->module->getInterceptors() as $wrapper) {
+            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+        }
+        
         return $resolvedInstances;
     }
 }

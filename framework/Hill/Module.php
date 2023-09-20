@@ -11,8 +11,11 @@ class Module
     private $relatedModules;
     private $controllers;
     private $providers;
-    private $instances;
     private $config;
+    private $guards;
+    private $pipes;
+    private $middlewares;
+    private $interceptors;
 
     /**
      * @param string $moduleClass
@@ -24,8 +27,11 @@ class Module
         $this->relatedModules = [];
         $this->controllers = [];
         $this->providers = [];
-        $this->instances = [];
         $this->config = $config;
+        $this->guards = [];
+        $this->pipes = [];
+        $this->middlewares = [];
+        $this->interceptors = [];
     }
 
     /**
@@ -68,12 +74,24 @@ class Module
         return $this->providers;
     }
 
+    public function getGuards() {
+        return $this->guards;
+    }
+
+    public function getPipes() {
+        return $this->pipes;
+    }
+
+    public function getMiddlewares() {
+        return $this->middlewares;
+    }
+
     /**
      * 
      */
-    public function getInstances()
+    public function getInterceptors()
     {
-        return $this->instances;
+        return $this->interceptors;
     }
 
     /**
@@ -93,13 +111,31 @@ class Module
         $this->providers[$instanceClass] =
             new InstanceWrapper($instanceClass, $factory);
     }
-
+    
     /**
      * 
      */
-    public function addInstance($instanceClass)
+    public function addGuard($instanceClass)
     {
-        $this->instances[$instanceClass] =
+        $this->guards[$instanceClass] =
+            new InstanceWrapper($instanceClass);
+    }
+
+    public function addPipe($instanceClass)
+    {
+        $this->pipes[$instanceClass] =
+            new InstanceWrapper($instanceClass);
+    }
+
+    public function addMiddleware($instanceClass)
+    {
+        $this->middlewares[$instanceClass] =
+            new InstanceWrapper($instanceClass);
+    }
+
+    public function addInterceptor($instanceClass)
+    {
+        $this->interceptors[$instanceClass] =
             new InstanceWrapper($instanceClass);
     }
 

@@ -17,9 +17,11 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         $container = \Hill\Test::createTestModule(\TestModule\TestModule::class);
         /** @var \Hill\Module $testModule */
         $testModule = $container->get(\TestModule\TestModule::class);
+
         /** @var \TestModule\Service\TestProvider $testService */
         $testService = $testModule->get(\TestModule\Service\TestService::class);
         $testService->sayHello();
+
 
         // scan routes
         $routeScanner = new RouteScanner($container);
