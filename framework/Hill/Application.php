@@ -96,6 +96,9 @@ class Application
 
         $requestHandler = new RequestHandler($this->routes, $this->errorHandler);
 
-        return $requestHandler->handle($request);
+        $response = $requestHandler->handle($request);
+        if ($response !== null) {
+            $response->send();
+        }
     }
 }
