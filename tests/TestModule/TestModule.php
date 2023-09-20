@@ -14,11 +14,11 @@ class TestModule implements \Hill\IModule {
                 \TestModule\Controller\TestController::class,
             ],
             'providers' => [
-                \TestModule\Service\SomeService::class,
+                //\TestModule\Service\SomeService::class,
                 \TestModule\Service\TestService::class,
             ],
             'importModules' => [
-                \SomeModule\SomeModule::class,
+                //\SomeModule\SomeModule::class,
             ],
         ];
     }

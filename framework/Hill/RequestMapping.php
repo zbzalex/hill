@@ -20,7 +20,17 @@ class RequestMapping
      * @var IGuard[] $guards
      */
     public $guards;
-    
+
+    /**
+     * 
+     */
+    public $middlewares;
+
+    /**
+     * 
+     */
+    public $interceptors;
+
     /**
      * 
      */
@@ -29,12 +39,16 @@ class RequestMapping
         $path,
         $action,
         array $pipes = [],
-        array $guards = []
+        array $guards = [],
+        array $middlewares = [],
+        array $interceptors = []
     ) {
         $this->requestMethod = $requestMethod;
         $this->path = $path;
         $this->action = $action;
         $this->pipes = $pipes;
         $this->guards = $guards;
+        $this->middlewares = $middlewares;
+        $this->interceptors = $interceptors;
     }
 }

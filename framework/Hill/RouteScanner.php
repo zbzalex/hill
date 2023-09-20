@@ -53,10 +53,24 @@ class RouteScanner
                     $guards = isset($config['guards'])
                         ? $config['guards']
                         : [];
+                    $middlewares = isset($config['middlewares'])
+                        ? $config['middlewares']
+                        : [];
+                    $interceptors = isset($config['interceptors'])
+                        ? $config['interceptors']
+                        : [];
                     
                     $path = rtrim($basePath . $controllerBasePath, "/") . "/";
 
-                    $this->registerRoutes($instanceResolver, $wrapper, $path, $mapping, $guards);
+                    $this->registerRoutes(
+                        $instanceResolver,
+                        $wrapper,
+                        $path,
+                        $mapping,
+                        $guards,
+                        $middlewares,
+                        $interceptors
+                    );
                 } catch (\ReflectionException $e) {
                 }
             }
@@ -73,9 +87,13 @@ class RouteScanner
         $wrapper,
         $basePath,
         array $mapping,
-        array $guards
+        array $guards,
+        array $middlewares,
+        array $interceptors
     ) {
         foreach ($mapping as $map) {
+            /** @var RequestMapping $map */
+
             $path = $basePath . trim($map->path, '/');
             if ($path != "/") {
                 $path = rtrim($path, "/");
@@ -92,6 +110,14 @@ class RouteScanner
                 $instanceResolver->registerAndResolveInstances(array_merge(
                     $map->guards,
                     $guards
+                )),
+                $instanceResolver->registerAndResolveInstances(array_merge(
+                    $map->middlewares,
+                    $middlewares
+                )),
+                $instanceResolver->registerAndResolveInstances(array_merge(
+                    $map->interceptors,
+                    $interceptors
                 ))
             );
 

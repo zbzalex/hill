@@ -20,21 +20,24 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         /** @var \TestModule\Service\TestProvider $testService */
         $testService = $testModule->get(\TestModule\Service\TestService::class);
         $testService->sayHello();
-        
+
         // scan routes
         $routeScanner = new RouteScanner($container);
         $routes = $routeScanner->scan("/");
 
         // create request
         $request = new Request(RequestMethod::GET, "/");
-        
+
         // handle request and send response
-        $requestHandler = new \Hill\RequestHandler($routes, function(\Hill\HttpException $e) {
+        $requestHandler = new \Hill\RequestHandler($routes, function (\Hill\HttpException $e) {
             $response = new \Hill\Response(null);
             $response->status($e->getCode());
             return $response;
         });
 
         $response = $requestHandler->handle($request);
+        if ($response !== null) {
+            $response->send();
+        }
     }
 }

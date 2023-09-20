@@ -25,6 +25,7 @@ class RequestHandler
     {
         // Ответ
         $response = null;
+        $route = null;
 
         try {
             // Матчинг раута
@@ -37,6 +38,12 @@ class RequestHandler
             $controller = $route->getController();
             try {
                 $reflectionClass = new \ReflectionClass($controller[0]);
+
+                foreach ($route->getMiddlewares() as $middleware) {
+                    if (($response = $middleware($request)) !== null) {
+                        throw new Result($response);
+                    }
+                }
 
                 // Вызываем гуарды, которые есть в найденом роуте                
                 foreach ($route->getGuards() as $guard) {
@@ -60,18 +67,17 @@ class RequestHandler
         } catch (Result $result) {
             // Получим результат, который вернёт ответ
             $response = $result->getResponse();
+            
+            foreach ($route->getInterceptors() as $interceptor) {
+                $response = $interceptor($request, $response);
+            }
         } catch (HttpException $e) {
             // Если выброшено исключение - прокидываем его в обработчик ошибок
             $response = call_user_func_array($this->errorHandler, [
                 $e
             ]);
         }
-
-        // Если ответ был получен - отправляем его!
-        if ($response !== null) {
-            $response->send();
-        }
-
+        
         return $response;
     }
 }

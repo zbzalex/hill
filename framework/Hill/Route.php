@@ -42,6 +42,17 @@ class Route
      */
     private $args;
 
+
+    /**
+     * 
+     */
+    private $middlewares;
+
+    /**
+     * 
+     */
+    private $interceptors;
+
     /**
      * 
      */
@@ -50,7 +61,9 @@ class Route
         $path,
         $controller,
         $pipes,
-        $guards
+        $guards,
+        $middlewares,
+        $interceptors
     ) {
         $this->requestMethod = $requestMethod;
         $this->path = $path;
@@ -58,6 +71,8 @@ class Route
         $this->pipes = $pipes;
         $this->guards = $guards;
         $this->args = [];
+        $this->middlewares = $middlewares;
+        $this->interceptors = $interceptors;
     }
 
     /**
@@ -140,5 +155,13 @@ class Route
     public function getArgs()
     {
         return $this->args;
+    }
+
+    public function getMiddlewares() {
+        return $this->middlewares;
+    }
+
+    public function getInterceptors() {
+        return $this->interceptors;
     }
 }
