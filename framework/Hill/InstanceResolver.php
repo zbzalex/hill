@@ -67,8 +67,6 @@ class InstanceResolver
         foreach ($instances as $instanceClass) {
             if (is_callable($instanceClass)) {
                 $resolvedInstances[] = $instanceClass;
-
-                var_dump($instanceClass);
                 continue;
             }
 
