@@ -71,7 +71,7 @@ class RequestHandler
             foreach ($route->getInterceptors() as $interceptor) {
                 $response = $interceptor($request, $response);
             }
-        } catch (HttpException $e) {
+        } catch (\Exception $e) {
             // Если выброшено исключение - прокидываем его в обработчик ошибок
             $response = call_user_func_array($this->errorHandler, [
                 $e
