@@ -45,11 +45,12 @@ class InstanceResolver
                 continue;
             }
 
-            if (isset($guards[$instanceClass]))
-                continue;
-
-            $wrapper = $this->module->addGuard($instanceClass);
-            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            if (isset($guards[$instanceClass])) {
+                $resolvedInstances[] = $guards[$instanceClass];
+            } else {
+                $wrapper = $this->module->addGuard($instanceClass);
+                $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            }
         }
 
         return $resolvedInstances;
@@ -70,11 +71,12 @@ class InstanceResolver
                 continue;
             }
 
-            if (isset($pipes[$instanceClass]))
-                continue;
-
-            $wrapper = $this->module->addPipe($instanceClass);
-            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            if (isset($pipes[$instanceClass])) {
+                $resolvedInstances[] = $pipes[$instanceClass];
+            } else {
+                $wrapper = $this->module->addPipe($instanceClass);
+                $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            }
         }
 
         return $resolvedInstances;
@@ -95,11 +97,12 @@ class InstanceResolver
                 continue;
             }
 
-            if (isset($middlewares[$instanceClass]))
-                continue;
-
-            $wrapper = $this->module->addMiddleware($instanceClass);
-            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            if (isset($middlewares[$instanceClass])) {
+                $resolvedInstances[] = $middlewares[$instanceClass];
+            } else {
+                $wrapper = $this->module->addMiddleware($instanceClass);
+                $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            }
         }
 
         return $resolvedInstances;
@@ -120,11 +123,12 @@ class InstanceResolver
                 continue;
             }
 
-            if (isset($interceptors[$instanceClass]))
-                continue;
-
-            $wrapper = $this->module->addInterceptor($instanceClass);
-            $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            if (isset($interceptors[$instanceClass])) {
+                $resolvedInstances[] = $interceptors[$instanceClass];
+            } else {
+                $wrapper = $this->module->addInterceptor($instanceClass);
+                $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
+            }
         }
 
         return $resolvedInstances;
