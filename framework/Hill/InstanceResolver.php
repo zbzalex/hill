@@ -46,7 +46,7 @@ class InstanceResolver
             }
 
             if (isset($guards[$instanceClass])) {
-                $resolvedInstances[] = $guards[$instanceClass];
+                $resolvedInstances[] = $guards[$instanceClass]->instance;
             } else {
                 $wrapper = $this->module->addGuard($instanceClass);
                 $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
@@ -72,7 +72,7 @@ class InstanceResolver
             }
 
             if (isset($pipes[$instanceClass])) {
-                $resolvedInstances[] = $pipes[$instanceClass];
+                $resolvedInstances[] = $pipes[$instanceClass]->instance;
             } else {
                 $wrapper = $this->module->addPipe($instanceClass);
                 $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
@@ -98,7 +98,7 @@ class InstanceResolver
             }
 
             if (isset($middlewares[$instanceClass])) {
-                $resolvedInstances[] = $middlewares[$instanceClass];
+                $resolvedInstances[] = $middlewares[$instanceClass]->instance;
             } else {
                 $wrapper = $this->module->addMiddleware($instanceClass);
                 $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
@@ -124,7 +124,7 @@ class InstanceResolver
             }
 
             if (isset($interceptors[$instanceClass])) {
-                $resolvedInstances[] = $interceptors[$instanceClass];
+                $resolvedInstances[] = $interceptors[$instanceClass]->instance;
             } else {
                 $wrapper = $this->module->addInterceptor($instanceClass);
                 $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
