@@ -74,20 +74,32 @@ class Module
         return $this->providers;
     }
 
-    public function getGuards() {
+    /**
+     * 
+     */
+    public function getGuards()
+    {
         return $this->guards;
-    }
-
-    public function getPipes() {
-        return $this->pipes;
-    }
-
-    public function getMiddlewares() {
-        return $this->middlewares;
     }
 
     /**
      * 
+     */
+    public function getPipes()
+    {
+        return $this->pipes;
+    }
+
+    /**
+     * 
+     */
+    public function getMiddlewares()
+    {
+        return $this->middlewares;
+    }
+
+    /**
+     * @return InstanceWrappers[]
      */
     public function getInterceptors()
     {
@@ -95,58 +107,97 @@ class Module
     }
 
     /**
+     * @param string $instanceClass
      * 
+     * @return InstanceWrapper
      */
     public function addController($instanceClass)
     {
-        $this->controllers[$instanceClass] =
-            new InstanceWrapper($instanceClass);
+        $wrapper = new InstanceWrapper($instanceClass);
+        $this->controllers[$instanceClass] = $wrapper;
+
+        return $wrapper;
     }
 
     /**
+     * @param string $instanceClass
+     * @param mixed $factory
      * 
+     * @return InstanceWrapper
      */
     public function addProvider($instanceClass, $factory = null)
     {
-        $this->providers[$instanceClass] =
-            new InstanceWrapper($instanceClass, $factory);
+        $wrapper = new InstanceWrapper($instanceClass, $factory);
+        $this->providers[$instanceClass] = $wrapper;
+
+        return $wrapper;
     }
-    
+
     /**
+     * @param string $instanceClass
      * 
+     * @return InstanceWrapper
      */
     public function addGuard($instanceClass)
     {
-        $this->guards[$instanceClass] =
-            new InstanceWrapper($instanceClass);
-    }
+        $wrapper = new InstanceWrapper($instanceClass);
+        $this->guards[$instanceClass] = $wrapper;
 
-    public function addPipe($instanceClass)
-    {
-        $this->pipes[$instanceClass] =
-            new InstanceWrapper($instanceClass);
-    }
-
-    public function addMiddleware($instanceClass)
-    {
-        $this->middlewares[$instanceClass] =
-            new InstanceWrapper($instanceClass);
-    }
-
-    public function addInterceptor($instanceClass)
-    {
-        $this->interceptors[$instanceClass] =
-            new InstanceWrapper($instanceClass);
+        return $wrapper;
     }
 
     /**
+     * @param string $instanceClass
      * 
+     * @return InstanceWrapper
+     */
+    public function addPipe($instanceClass)
+    {
+        $wrapper = new InstanceWrapper($instanceClass);
+        $this->pipes[$instanceClass] = $wrapper;
+
+        return $wrapper;
+    }
+
+    /**
+     * @param stirng $instanceClass
+     * 
+     * @return InstanceWrapper
+     */
+    public function addMiddleware($instanceClass)
+    {
+        $wrapper = new InstanceWrapper($instanceClass);
+        $this->middlewares[$instanceClass] = $wrapper;
+
+        return $wrapper;
+    }
+
+    /**
+     * @param string $instanceClass
+     * 
+     * @return InstanceWrapper
+     */
+    public function addInterceptor($instanceClass)
+    {
+        $wrapper = new InstanceWrapper($instanceClass);
+        $this->interceptors[$instanceClass] = $wrapper;
+
+        return $wrapper;
+    }
+
+    /**
+     * @param Module $module
      */
     public function addRelatedModule(Module $module)
     {
         $this->relatedModules[$module->getModuleClass()] = $module;
     }
-    
+
+    /**
+     * @param string $providerClass
+     * 
+     * @return object|null
+     */
     public function get($providerClass)
     {
         return isset($this->providers[$providerClass])

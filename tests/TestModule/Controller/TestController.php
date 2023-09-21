@@ -21,13 +21,13 @@ class TestController extends \Hill\Controller implements \Hill\IController {
                     return new Response("interrupted respose");
                 }
             ],
-            // 'interceptors' => [
-            //     function(Request $request, Response $response) {
-            //         $response->clear();
-            //         $response->write("This is transformed response");
-            //         return $response;
-            //     }
-            // ]
+            'interceptors' => [
+                function(Request $request, Response $response) {
+                    $response->clear();
+                    $response->write("This is transformed response");
+                    return $response;
+                }
+            ]
         ];
     }
 

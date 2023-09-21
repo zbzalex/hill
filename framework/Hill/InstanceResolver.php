@@ -29,7 +29,7 @@ class InstanceResolver
             $this->injector->resolveInstance($controller);
         }
     }
-    
+
     /**
      * @param string[] $instances
      * 
@@ -48,10 +48,7 @@ class InstanceResolver
             if (isset($guards[$instanceClass]))
                 continue;
 
-            $this->module->addGuard($instanceClass);
-        }
-
-        foreach ($this->module->getGuards() as $wrapper) {
+            $wrapper = $this->module->addGuard($instanceClass);
             $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
         }
 
@@ -70,19 +67,18 @@ class InstanceResolver
         foreach ($instances as $instanceClass) {
             if (is_callable($instanceClass)) {
                 $resolvedInstances[] = $instanceClass;
+
+                var_dump($instanceClass);
                 continue;
             }
 
             if (isset($pipes[$instanceClass]))
                 continue;
 
-            $this->module->addPipe($instanceClass);
-        }
-
-        foreach ($this->module->getPipes() as $wrapper) {
+            $wrapper = $this->module->addPipe($instanceClass);
             $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
         }
-        
+
         return $resolvedInstances;
     }
 
@@ -104,13 +100,10 @@ class InstanceResolver
             if (isset($middlewares[$instanceClass]))
                 continue;
 
-            $this->module->addMiddleware($instanceClass);
-        }
-
-        foreach ($this->module->getMiddlewares() as $wrapper) {
+            $wrapper = $this->module->addMiddleware($instanceClass);
             $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
         }
-        
+
         return $resolvedInstances;
     }
 
@@ -132,13 +125,10 @@ class InstanceResolver
             if (isset($interceptors[$instanceClass]))
                 continue;
 
-            $this->module->addInterceptor($instanceClass);
-        }
-
-        foreach ($this->module->getInterceptors() as $wrapper) {
+            $wrapper = $this->module->addInterceptor($instanceClass);
             $resolvedInstances[] = $this->injector->resolveInstance($wrapper);
         }
-        
+
         return $resolvedInstances;
     }
 }
