@@ -2,9 +2,10 @@
 
 namespace Hill;
 
-//
-// Определяет класс, которым может управлять контейнер зависимостей.
-//
+/**
+ * Dependency injection interface that allow to inject into class dependencies
+ * Part of framework architecture
+ */
 interface IInjectable
 {
 }

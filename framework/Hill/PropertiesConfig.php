@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Properties config class
+ */
 class PropertiesConfig
 {
     private $file;

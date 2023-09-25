@@ -2,10 +2,10 @@
 
 namespace Hill;
 
-//
-// Фабрика приложений.
-//
-class ApplicationFactory
+/**
+ * Web application factory
+ */
+class WebApplicationFactory
 {
     /**
      * @return Application

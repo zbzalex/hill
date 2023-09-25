@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-// Метод запроса.
-//
+/**
+ * Request method enum class
+ */
 class RequestMethod
 {
     const GET       = 'GET';

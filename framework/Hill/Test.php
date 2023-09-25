@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Class for module testing
+ */
 class Test
 {
     public static function createTestModule($moduleConfigOrClass)

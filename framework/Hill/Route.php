@@ -2,18 +2,18 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Route data object class
+ */
 class Route
 {
     /**
-     * 
+     * @var string $requestMethod Request method
      */
     private $requestMethod;
 
     /**
-     * 
+     * @var string $path Path
      */
     private $path;
 

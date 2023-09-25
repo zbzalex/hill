@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-// Исключение, которое сигнализирует об обработке http ошибки.
-//
+/**
+ * Http exception class
+ */
 class HttpException extends \Exception
 {
 }

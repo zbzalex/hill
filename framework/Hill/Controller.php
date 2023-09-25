@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Base abstract controller class
+ */
 abstract class Controller
 {
     /**

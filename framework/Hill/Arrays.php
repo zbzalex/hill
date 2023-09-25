@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Class helper for arrays
+ */
 class Arrays
 {
     public static function find(array $array, $fn)

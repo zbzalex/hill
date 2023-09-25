@@ -2,9 +2,10 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Guard interface
+ * Part of framework architecture
+ */
 interface IGuard
 {
     /**

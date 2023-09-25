@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-// Контейнер.
-//
+/**
+ * Module container class
+ */
 class Container
 {
     /**

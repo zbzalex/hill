@@ -2,12 +2,18 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Properties config generator
+ */
 class PropertiesConfigGenerator {
+    /**
+     * @var PropertiesConfig $config
+     */
     private $config;
 
+    /**
+     * @param PropertiesConfig $config
+     */
     public function __construct(PropertiesConfig $config) {
         $this->config = $config;
     }

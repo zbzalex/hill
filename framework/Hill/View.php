@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Simple view class
+ */
 class View
 {
     public $path;
@@ -97,6 +97,6 @@ class View
 
     public function e($str)
     {
-        echo htmlentities($str);
+        return htmlentities($str);
     }
 }

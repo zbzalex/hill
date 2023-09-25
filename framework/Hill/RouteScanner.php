@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Router clanner class
+ */
 class RouteScanner
 {
     /**

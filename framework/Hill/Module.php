@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Module class that store all module meta information
+ */
 class Module
 {
     private $moduleClass;
@@ -18,8 +18,8 @@ class Module
     private $interceptors;
 
     /**
-     * @param string $moduleClass
-     * @param array $config
+     * @param string $moduleClass   Module class
+     * @param array  $config        Module config
      */
     public function __construct($moduleClass, array $config = [])
     {

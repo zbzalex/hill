@@ -2,13 +2,24 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Request mapping class
+ */
 class RequestMapping
 {
+    /**
+     * @var string $requestMethod Request method
+     */
     public $requestMethod;
+
+    /**
+     * @var string $path Path
+     */
     public $path;
+
+    /**
+     * @var string $action
+     */
     public $action;
 
     /**

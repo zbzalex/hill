@@ -2,14 +2,25 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Request handler class
+ */
 class RequestHandler
 {
+    /**
+     * @var RequestMatcher $requestMatcher Request matcher
+     */
     private $matcher;
+
+    /**
+     * @var _ $errorHandler Invokable error handler
+     */
     private $errorHandler;
 
+    /**
+     * @param Route[] $routes
+     * @param _       $errorHandler
+     */
     public function __construct(array $routes, $errorHandler)
     {
         $this->matcher = new RouteMatcher($routes);

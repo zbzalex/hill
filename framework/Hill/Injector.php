@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Dependency injector class
+ */
 class Injector
 {
     /**

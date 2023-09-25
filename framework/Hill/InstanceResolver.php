@@ -2,14 +2,24 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Instance resolver
+ */
 class InstanceResolver
 {
+    /**
+     * @var Module $module The module
+     */
     private $module;
+
+    /**
+     * @var Injector $injector Dependency injector
+     */
     private $injector;
 
+    /**
+     * @param Module $module
+     */
     public function __construct(Module $module)
     {
         $this->module = $module;

@@ -2,40 +2,69 @@
 
 namespace Hill;
 
-//
-// Запрос.
-//
+/**
+ * Request class
+ */
 class Request
 {
     /**
-     * @var string string
+     * @var string $method Request method
      */
     public $method = RequestMethod::GET;
 
     /**
-     * @var string $uri
+     * @var string $uri Request uri
      */
     public $uri;
 
     /**
-     * @var array
+     * @var array $headers Request headers array
      */
     public $headers = [];
 
     /**
-     * @var array
+     * @var array $attributes Attributes array
      */
     public $attributes = [];
     
+    /**
+     * @var array $query _GET array
+     */
     public $query;
+
+    /**
+     * @var array $data  _POST array
+     */
     public $data;
+
+    /**
+     * @var array $cookies Cookies array
+     */
     public $cookies;
+
+    /**
+     * @var array $files Files array
+     */
     public $files;
+    
+    /**
+     * @var bool $secure Secure flag
+     */
     public $secure;
 
+    /**
+     * @var string $type Request content type
+     */
     public $type;
+
+    /**
+     * @var string $body Request content body
+     */
     public $body;
 
+    /**
+     * @var int $length Request content length
+     */
     public $length;
 
     /**

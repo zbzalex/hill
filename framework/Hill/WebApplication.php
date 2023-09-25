@@ -2,10 +2,10 @@
 
 namespace Hill;
 
-//
-// Приложение.
-//
-class Application
+/**
+ * Web application class
+ */
+class WebApplication
 {
     /**
      * @var Container

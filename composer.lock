@@ -577,12 +577,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "521cc63ee092640331ae7b940d615f8a09718221"
+                "reference": "c6eb87b40b4e294d028c60be8ba274ce514abd31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/521cc63ee092640331ae7b940d615f8a09718221",
-                "reference": "521cc63ee092640331ae7b940d615f8a09718221",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c6eb87b40b4e294d028c60be8ba274ce514abd31",
+                "reference": "c6eb87b40b4e294d028c60be8ba274ce514abd31",
                 "shasum": ""
             },
             "require": {
@@ -671,7 +671,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-19T05:43:42+00:00"
+            "time": "2023-09-25T12:24:21+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -1122,12 +1122,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "326ce39e7aba308b2905b3ade1c6f811b2964a09"
+                "reference": "64f51654862e0f5e318db7e9dcc2292c63cdbddc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/326ce39e7aba308b2905b3ade1c6f811b2964a09",
-                "reference": "326ce39e7aba308b2905b3ade1c6f811b2964a09",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/64f51654862e0f5e318db7e9dcc2292c63cdbddc",
+                "reference": "64f51654862e0f5e318db7e9dcc2292c63cdbddc",
                 "shasum": ""
             },
             "require": {
@@ -1185,7 +1185,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
                 "security": "https://github.com/sebastianbergmann/exporter/security/policy",
-                "source": "https://github.com/sebastianbergmann/exporter/tree/main"
+                "source": "https://github.com/sebastianbergmann/exporter/tree/5.1.1"
             },
             "funding": [
                 {
@@ -1193,7 +1193,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-18T07:16:40+00:00"
+            "time": "2023-09-24T13:22:09+00:00"
         },
         {
             "name": "sebastian/global-state",

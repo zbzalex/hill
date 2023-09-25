@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-// Определяет модуль
-//
+/**
+ * Module class
+ */
 interface IModule
 {
     /**

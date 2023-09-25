@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Reflector class
+ */
 class Reflector
 {
     /**

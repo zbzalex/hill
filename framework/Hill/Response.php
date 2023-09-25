@@ -2,21 +2,24 @@
 
 namespace Hill;
 
-//
-// Ответ.
-//
+/**
+ * The response class
+ */
 class Response
 {
     /**
-     * 
+     * @var string $body Response body
      */
     private $body;
 
     /**
-     * 
+     * @var array<string, string> $headers Response headers
      */
     private $headers;
 
+    /**
+     * @var array<int, string> $codes Http status codes
+     */
     public static $codes = [
         100 => 'Continue',
         101 => 'Switching Protocols',

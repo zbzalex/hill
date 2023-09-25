@@ -29,13 +29,13 @@ class DependencyScanner
     }
 
     /**
-     * @param strint $moduleClass
+     * @param string $moduleClass
      * 
      * @throws \ReflectionException
      * 
      * @return array
      */
-    private function createModule($moduleClass)
+    private static function createModule($moduleClass)
     {
         $reflectionClass = new \ReflectionClass($moduleClass);
         if (!$reflectionClass->implementsInterface(\Hill\IModule::class)) {
