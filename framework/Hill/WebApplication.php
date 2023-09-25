@@ -5,7 +5,7 @@ namespace Hill;
 /**
  * Web application class
  */
-class WebApplication
+class WebApplication implements IApplication
 {
     /**
      * @var Container

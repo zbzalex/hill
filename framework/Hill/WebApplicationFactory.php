@@ -5,17 +5,17 @@ namespace Hill;
 /**
  * Web application factory
  */
-class WebApplicationFactory
+class WebApplicationFactory implements IApplicationFactory
 {
     /**
-     * @return Application
+     * @return IApplication
      */
     public static function create($moduleConfigOrClass, $basePath = "/")
     {
         $compiler = new Compiler($moduleConfigOrClass);
         $container = $compiler->compile();
 
-        $app = new Application($container);
+        $app = new WebApplication($container);
         $app->setBasePath($basePath);
         $app->init();
 
