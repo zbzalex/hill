@@ -108,16 +108,16 @@ class RouteScanner
                 ],
                 $instanceResolver->resolvePipes($map->pipes),
                 $instanceResolver->resolveGuards(array_merge(
+                    $guards,
                     $map->guards,
-                    $guards
                 )),
                 $instanceResolver->resolveMiddlewares(array_merge(
+                    $middlewares,
                     $map->middlewares,
-                    $middlewares
                 )),
                 $instanceResolver->resolveInterceptors(array_merge(
+                    $interceptors,
                     $map->interceptors,
-                    $interceptors
                 ))
             );
 
