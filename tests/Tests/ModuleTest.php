@@ -29,7 +29,7 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
 
         // create request
         $request = new Request(RequestMethod::GET, "/");
-
+	
         // handle request and send response
         $requestHandler = new \Hill\RequestHandler($routes, function (\Exception $e) {
             if ($e instanceof \Hill\HttpException) {

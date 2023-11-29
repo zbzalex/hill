@@ -6,11 +6,11 @@ namespace TestModule\Service;
 //
 //
 class TestService implements \Hill\IInjectable {
-    public function __construct(
-    ) {
+    public function __construct() {
+    	// some contructed here
     }
 
     public function sayHello() {
-        echo "hello\n";
+	    echo "hello\n";
     }
 }
