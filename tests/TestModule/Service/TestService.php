@@ -2,15 +2,16 @@
 
 namespace TestModule\Service;
 
-//
-//
-//
 class TestService implements \Hill\IInjectable {
-    public function __construct() {
-    	// some contructed here
+    private $someService_;
+    
+    public function __construct(
+        \SomeModule\Service\SomeService $someService
+    ) {
+        $this->someService_ = $someService;
     }
 
     public function sayHello() {
-	    echo "hello\n";
+        return $this->someService_->sayHello();
     }
 }

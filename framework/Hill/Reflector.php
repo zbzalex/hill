@@ -21,7 +21,12 @@ class Reflector
                 if (count($constructorParams) != 0) {
                     $args = [];
                     foreach ($constructorParams as $param) {
-                        $args[] = $param->getType()->getName();
+                        /** @var \ReflectionNamedType $type */
+                        $type = $param->getType();
+                        if ($type === null)
+                            break;
+
+                        $args[] = $type->getName();
                     }
 
                     return $args;

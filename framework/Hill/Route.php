@@ -7,6 +7,8 @@ namespace Hill;
  */
 class Route
 {
+    private $module;
+
     /**
      * @var string $requestMethod Request method
      */
@@ -30,16 +32,6 @@ class Route
     /**
      * 
      */
-    private $pipes;
-
-    /**
-     * 
-     */
-    private $guards;
-
-    /**
-     * 
-     */
     private $args;
 
 
@@ -57,19 +49,17 @@ class Route
      * 
      */
     public function __construct(
+        Module $module,
         $requestMethod,
         $path,
         $controller,
-        $pipes,
-        $guards,
         $middlewares,
         $interceptors
     ) {
+        $this->module = $module;
         $this->requestMethod = $requestMethod;
         $this->path = $path;
         $this->controller = $controller;
-        $this->pipes = $pipes;
-        $this->guards = $guards;
         $this->args = [];
         $this->middlewares = $middlewares;
         $this->interceptors = $interceptors;
@@ -101,6 +91,8 @@ class Route
         $this->compiledPath = $path;
     }
 
+    public function getModule() { return $this->module; }
+
     /**
      * 
      */
@@ -131,22 +123,6 @@ class Route
     public function getCompiledPath()
     {
         return $this->compiledPath;
-    }
-
-    /**
-     * 
-     */
-    public function getPipes()
-    {
-        return $this->pipes;
-    }
-
-    /**
-     * 
-     */
-    public function getGuards()
-    {
-        return $this->guards;
     }
 
     /**

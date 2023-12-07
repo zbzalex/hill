@@ -2,18 +2,18 @@
 
 namespace Hill;
 
+use ArrayObject;
+
 /**
  * Module class that store all module meta information
  */
-class Module
+class Module extends ArrayObject
 {
-    private $moduleClass;
-    private $relatedModules;
+    private string $moduleClass;
+    private $imports;
     private $controllers;
     private $providers;
-    private $config;
-    private $guards;
-    private $pipes;
+    private array $config;
     private $middlewares;
     private $interceptors;
 
@@ -24,12 +24,10 @@ class Module
     public function __construct($moduleClass, array $config = [])
     {
         $this->moduleClass = $moduleClass;
-        $this->relatedModules = [];
+        $this->imports = [];
         $this->controllers = [];
         $this->providers = [];
         $this->config = $config;
-        $this->guards = [];
-        $this->pipes = [];
         $this->middlewares = [];
         $this->interceptors = [];
     }
@@ -53,9 +51,9 @@ class Module
     /**
      * @return Module[]
      */
-    public function getRelatedModules()
+    public function getImports()
     {
-        return $this->relatedModules;
+        return $this->imports;
     }
 
     /**
@@ -72,22 +70,6 @@ class Module
     public function getProviders()
     {
         return $this->providers;
-    }
-
-    /**
-     * 
-     */
-    public function getGuards()
-    {
-        return $this->guards;
-    }
-
-    /**
-     * 
-     */
-    public function getPipes()
-    {
-        return $this->pipes;
     }
 
     /**
@@ -134,32 +116,6 @@ class Module
     }
 
     /**
-     * @param string $instanceClass
-     * 
-     * @return InstanceWrapper
-     */
-    public function addGuard($instanceClass)
-    {
-        $wrapper = new InstanceWrapper($instanceClass);
-        $this->guards[$instanceClass] = $wrapper;
-
-        return $wrapper;
-    }
-
-    /**
-     * @param string $instanceClass
-     * 
-     * @return InstanceWrapper
-     */
-    public function addPipe($instanceClass)
-    {
-        $wrapper = new InstanceWrapper($instanceClass);
-        $this->pipes[$instanceClass] = $wrapper;
-
-        return $wrapper;
-    }
-
-    /**
      * @param stirng $instanceClass
      * 
      * @return InstanceWrapper
@@ -188,20 +144,30 @@ class Module
     /**
      * @param Module $module
      */
-    public function addRelatedModule(Module $module)
+    public function addImport(Module $module)
     {
-        $this->relatedModules[$module->getModuleClass()] = $module;
+        $this->imports[$module->getModuleClass()] = $module;
     }
-
+    
     /**
      * @param string $providerClass
      * 
      * @return object|null
      */
-    public function get($providerClass)
+    public function offsetGet($providerClass)
     {
         return isset($this->providers[$providerClass])
             ? $this->providers[$providerClass]->instance
             : null;
+    }
+
+    /**
+     * Check if module is global
+     * 
+     * @return bool
+     */
+    public function isGlobal()
+    {
+        return isset($this->config['global']) && $this->config['global'];
     }
 }

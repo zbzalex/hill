@@ -7,10 +7,11 @@ namespace Hill;
  */
 class Container
 {
-    /**
-     * @var Module[]
-     */
+    /** @var Module[] $modules */
     private $modules;
+
+    /** @var Module[] $globalModules */
+    private $globalModules;
 
     /**
      * Constructor
@@ -18,6 +19,7 @@ class Container
     public function __construct()
     {
         $this->modules = [];
+        $this->globalModules = [];
     }
 
     /**
@@ -26,11 +28,20 @@ class Container
      * 
      * @return Module|null
      */
-    public function addModule($moduleClass, array $config = [])
+    public function emplaceAndGetModule($moduleClass, array $config = [])
     {
         $module = new Module($moduleClass, $config);
-        
+
         $this->modules[$moduleClass] = $module;
+
+        return $module;
+    }
+
+    public function emplaceAndGetGlobalModule($moduleClass, array $config = [])
+    {
+        $module = new Module($moduleClass, $config);
+
+        $this->globalModules[$moduleClass] = $module;
 
         return $module;
     }
@@ -44,12 +55,24 @@ class Container
     }
 
     /**
+     * @return Module[]
+     */
+    public function getGlobalModules()
+    {
+        return $this->globalModules;
+    }
+
+    /**
      * @param string $moduleClass
      * 
      * @return Module
      */
-    public function get($moduleClass)
+    public function getModule($moduleClass)
     {
-        return isset($this->modules[$moduleClass]) ? $this->modules[$moduleClass] : null;
+        return isset($this->modules[$moduleClass])
+            ? $this->modules[$moduleClass]
+            : (isset($this->globalModules[$moduleClass])
+                ? $this->globalModules[$moduleClass]
+                : null);
     }
 }

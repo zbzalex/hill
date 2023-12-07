@@ -2,9 +2,9 @@
 
 namespace Hill;
 
-//
-//
-//
+/**
+ * Dependency scanner class
+ */
 class DependencyScanner
 {
     /**
@@ -13,6 +13,8 @@ class DependencyScanner
     private $container;
 
     /**
+     * Constructor
+     * 
      * @param Container $container
      */
     public function __construct(Container $container)
@@ -21,21 +23,62 @@ class DependencyScanner
     }
 
     /**
+     * Scan modules
+     * 
      * @param array $rootModuleConfig
      */
     public function scan($rootModuleConfigOrClass)
     {
         $this->scanForModules($rootModuleConfigOrClass);
+        $this->resolveModules();
+    }
+
+    private function resolveModules()
+    {
+        $globalModules  = $this->container->getGlobalModules();
+        $modules        = $this->container->getModules();
+
+        // resolve global modules
+        foreach ($globalModules as $module) {
+            $this->resolveModuleImports($module, false);
+        }
+
+        // resolve simple modules
+        foreach ($modules as $module) {
+            $this->resolveModuleImports($module);
+        }
+    }
+
+    private function resolveModuleImports(Module $module, $includeGlobalModules = true)
+    {
+        $importModules = $module->getImports();
+        if ($includeGlobalModules) {
+            $importModules = array_merge($this->container->getGlobalModules(), $importModules);
+        }
+
+        foreach ($importModules as $importModule) {
+            $importModuleConfig = $importModule->getConfig();
+            $exportProviders = isset($importModuleConfig['exportProviders'])
+                && is_array($importModuleConfig['exportProviders'])
+                ? $importModuleConfig['exportProviders']
+                : [];
+
+            foreach ($exportProviders as $exportProviderClass) {
+                $this->resolveProviderForModule($module, $importModule, $exportProviderClass);
+            }
+        }
     }
 
     /**
+     * Creates module config from module class
+     * 
      * @param string $moduleClass
      * 
      * @throws \ReflectionException
      * 
      * @return array
      */
-    private static function createModule($moduleClass)
+    private static function createModuleForClass($moduleClass)
     {
         $reflectionClass = new \ReflectionClass($moduleClass);
         if (!$reflectionClass->implementsInterface(\Hill\IModule::class)) {
@@ -44,23 +87,33 @@ class DependencyScanner
             );
         }
 
-        $moduleConfig = $reflectionClass->getMethod('create')->invoke(null);
+        $createMethod = $reflectionClass->getMethod('create');
+        if (!$createMethod->isStatic() || !$createMethod->isPublic()) {
+            throw new \ReflectionException(
+                "Module method 'create' must be public static!"
+            );
+        }
+
+        $moduleConfig = $createMethod->invoke(null);
 
         return $moduleConfig;
     }
 
     /**
+     * Scan modules
+     * 
      * @param string|array $moduleConfigOrClass
      * 
      * @throws \Exception
      * @throws \ReflectionException
      * 
-     * @return Module|null
+     * @return Module
      */
     private function scanForModules($moduleConfigOrClass)
     {
         $moduleConfig = [];
 
+        // resolve module
         if (is_array($moduleConfigOrClass)) {
             $moduleConfig = $moduleConfigOrClass;
             $moduleClass = isset($moduleConfig['moduleClass'])
@@ -69,77 +122,36 @@ class DependencyScanner
 
             if ($moduleClass === null)
                 throw new \Exception(
-                    "Where is module class in your module config?"
+                    "Module class property isnt specified!"
                 );
         } else {
             $moduleClass = $moduleConfigOrClass;
-            if (($moduleConfig = self::createModule($moduleClass)) === null)
+            if (($moduleConfig = self::createModuleForClass($moduleClass)) === null)
                 throw new \Exception(
                     sprintf("Failed to create module '%s'", $moduleClass)
                 );
         }
 
-        if (($module = $this->container->get($moduleClass)) !== null) {
+        // check if module already emplaced and return it if found
+        if (($module = $this->container->getModule($moduleClass)) !== null) {
             return $module;
         }
 
-        // push module into container
-        $module = $this->container->addModule($moduleClass, $moduleConfig);
+        // detect module scope and emplace into module container
+        $module = $moduleConfig['global']
+            ? $this->container->emplaceAndGetGlobalModule($moduleClass, $moduleConfig)
+            : $this->container->emplaceAndGetModule($moduleClass, $moduleConfig);
 
-        $this->scanModuleForDeps($module);
-
-        $importModules = isset($moduleConfig['importModules'])
-            && is_array($moduleConfig['importModules'])
-            ? $moduleConfig['importModules']
-            : [];
-
-        foreach ($importModules as $importModuleConfigOrClass) {
-            $importModuleConfig = [];
-            if (is_array($importModuleConfigOrClass)) {
-                $importModuleConfig = $importModuleConfigOrClass;
-            } else {
-                if ($importModuleConfigOrClass === null)
-                    continue;
-                
-                if (($importModule_ = $this->container->get($importModuleConfigOrClass)) !== null) {
-                    $importModuleConfig = $importModule_->getConfig();
-                } else {
-                    $importModuleConfig = self::createModule($importModuleConfigOrClass);
-                }
-            }
-
-            $importModule = $this->scanForModules($importModuleConfig);
-
-            // resolve exported providers from imported modules
-            $exportProviders = isset($importModuleConfig['exportProviders'])
-                && is_array($importModuleConfig['exportProviders'])
-                ? $importModuleConfig['exportProviders']
-                : [];
-
-            foreach ($exportProviders as $exportProviderClass) {
-                $this->resolveProviderDependencies($module, $importModule, $exportProviderClass);
-            }
-        }
-
-        return $module;
-    }
-
-    /**
-     * @param Module $module
-     */
-    private function scanModuleForDeps(Module $module)
-    {
-        $config = $module->getConfig();
-
+        // scan module for dependencies
         try {
-            $providers = isset($config['providers'])
-                && is_array($config['providers'])
-                ? $config['providers']
+            $providers = isset($moduleConfig['providers'])
+                && is_array($moduleConfig['providers'])
+                ? $moduleConfig['providers']
                 : [];
 
-            $controllers = isset($config['controllers'])
-                && is_array($config['controllers'])
-                ? $config['controllers']
+            $controllers = isset($moduleConfig['controllers'])
+                && is_array($moduleConfig['controllers'])
+                ? $moduleConfig['controllers']
                 : [];
 
             foreach ($providers as $providerConfigOrClass) {
@@ -175,7 +187,7 @@ class DependencyScanner
             foreach ($controllers as $controllerClass) {
                 if ($controllerClass === null)
                     continue;
-                
+
                 try {
                     $reflectionClass = new \ReflectionClass($controllerClass);
                     if (!$reflectionClass->implementsInterface(IController::class))
@@ -185,26 +197,65 @@ class DependencyScanner
                 } catch (\ReflectionException $e) {
                 }
             }
+
+            // must be optional property!
+            $importModules = isset($moduleConfig['importModules'])
+                && is_array($moduleConfig['importModules'])
+                ? $moduleConfig['importModules']
+                : [];
+
+            $this->scanModuleForImports($module, $importModules);
         } catch (\ReflectionException $e) {
+        }
+
+        return $module;
+    }
+
+    private function scanModuleForImports(Module $module, array $importModules)
+    {
+        foreach ($importModules as $importModuleConfigOrClass) {
+            $importModuleConfig = [];
+
+            if (is_array($importModuleConfigOrClass)) {
+                $importModuleConfig = $importModuleConfigOrClass;
+            } else {
+                if ($importModuleConfigOrClass === null)
+                    continue;
+
+                if (($importModule_ = $this->container->getModule($importModuleConfigOrClass)) !== null) {
+                    $importModuleConfig = $importModule_->getConfig();
+                } else {
+                    $importModuleConfig = self::createModuleForClass($importModuleConfigOrClass);
+                }
+            }
+
+            $importModule = $this->scanForModules($importModuleConfig);
+            if (!isset($importModuleConfig['global']) || !$importModuleConfig['global']) {
+                $module->addImport($importModule);
+            }
         }
     }
 
     /**
-     * @param Module $module
-     * @param Module $importModule
-     * @param string $providerClass
+     * Resolve provider dependencies for module
+     * 
+     * @param Module $module            The module
+     * @param Module $importModule      Related module
+     * @param string $providerClass     Provider class
      */
-    private function resolveProviderDependencies(Module $module, Module $importModule, $providerClass)
+    private function resolveProviderForModule(Module $module, Module $importModule, $providerClass)
     {
         $providers = $importModule->getProviders();
         if (isset($providers[$providerClass])) {
 
             $provider = $providers[$providerClass];
+
+            // check if provider isnt factory and resolve deps for export
             if ($provider->factory === null) {
                 try {
-                    $dependencies = Reflector::getConstructorArgs($providerClass);
-                    foreach ($dependencies as $dependencyProviderClass) {
-                        $this->resolveProviderDependencies($module, $importModule, $dependencyProviderClass);
+                    $deps = Reflector::getConstructorArgs($providerClass);
+                    foreach ($deps as $depProviderClass) {
+                        $this->resolveProviderForModule($module, $importModule, $depProviderClass);
                     }
                 } catch (\ReflectionException $e) {
                 }

@@ -22,43 +22,30 @@ class RequestMapping
      */
     public $action;
 
-    /**
-     * @var IPipe[] $pipes
-     */
-    public $pipes;
-
-    /**
-     * @var IGuard[] $guards
-     */
-    public $guards;
-
-    /**
-     * 
-     */
+    /** @var callable[] $middlewares */
     public $middlewares;
-
-    /**
-     * 
-     */
+    /** @var callable[] $interceptors */
     public $interceptors;
 
     /**
+     * Constructor
      * 
+     * @param string    $requestMethod
+     * @param string    $path
+     * @param string    $action
+     * @param array     $middlewares
+     * @param array     $interceptors
      */
     public function __construct(
         $requestMethod,
         $path,
         $action,
-        array $pipes = [],
-        array $guards = [],
         array $middlewares = [],
         array $interceptors = []
     ) {
         $this->requestMethod = $requestMethod;
         $this->path = $path;
         $this->action = $action;
-        $this->pipes = $pipes;
-        $this->guards = $guards;
         $this->middlewares = $middlewares;
         $this->interceptors = $interceptors;
     }

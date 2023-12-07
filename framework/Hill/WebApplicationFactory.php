@@ -8,7 +8,7 @@ namespace Hill;
 class WebApplicationFactory implements IApplicationFactory
 {
     /**
-     * @return IApplication
+     * @return WebApplication
      */
     public static function create($moduleConfigOrClass, $basePath = "/")
     {

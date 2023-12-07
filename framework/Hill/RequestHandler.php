@@ -8,18 +8,18 @@ namespace Hill;
 class RequestHandler
 {
     /**
-     * @var RequestMatcher $requestMatcher Request matcher
+     * @var RequestMatcher  $requestMatcher Request matcher
      */
     private $matcher;
 
     /**
-     * @var _ $errorHandler Invokable error handler
+     * @var callable        $errorHandler Invokable error handler
      */
     private $errorHandler;
 
     /**
-     * @param Route[] $routes
-     * @param _       $errorHandler
+     * @param Route[]   $routes
+     * @param callable  $errorHandler
      */
     public function __construct(array $routes, $errorHandler)
     {
@@ -51,23 +51,11 @@ class RequestHandler
                 $reflectionClass = new \ReflectionClass($controller[0]);
 
                 foreach ($route->getMiddlewares() as $middleware) {
-                    if (($response = $middleware($request)) !== null) {
+                    if (($response = $middleware($route->getModule(), $request)) !== null) {
                         throw new Result($response);
                     }
                 }
-
-                // Вызываем гуарды, которые есть в найденом роуте                
-                foreach ($route->getGuards() as $guard) {
-                    if (!$guard($request)) {
-                        throw new HttpException("Bad request", 400);
-                    }
-                }
-
-                // Вызываем пайпы, которые вызываны в этом роуте
-                foreach ($route->getPipes() as $pipe) {
-                    $pipe($request);
-                }
-
+                
                 // Вызываем обработчик роута
                 $reflectionClass->getMethod($controller[1])->invokeArgs($controller[0], [
                     $request
@@ -80,7 +68,7 @@ class RequestHandler
             $response = $result->getResponse();
             
             foreach ($route->getInterceptors() as $interceptor) {
-                $response = $interceptor($request, $response);
+                $response = $interceptor($route->getModule(), $request, $response);
             }
         } catch (\Exception $e) {
             // Если выброшено исключение - прокидываем его в обработчик ошибок

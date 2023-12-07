@@ -55,10 +55,18 @@ class Injector
                     $args = [];
 
                     foreach ($constructorParams as $param) {
-                        $paramClass = $param->getType()->getName();
+                        /** @var \ReflectionNamedType $type */
+                        $type = $param->getType();
+
+                        if ($type === null)
+                            break;
+
+                        $paramClass = $type->getName();
 
                         if (!isset($providers[$paramClass])) {
-                            throw new \Exception(sprintf("Unresolved instance '%s' in module '%s'", $paramClass, $this->module->getModuleClass()));
+                            throw new \Exception(sprintf(
+                                "Unresolved instance '%s' in module '%s'", $paramClass, $this->module->getModuleClass()
+                            ));
                         }
 
                         $provider = $providers[$paramClass];
@@ -93,6 +101,7 @@ class Injector
             return $reflectionClass->implementsInterface(IInjectable::class);
         } catch (\ReflectionException $e) {
         }
+        
         return false;
     }
 }

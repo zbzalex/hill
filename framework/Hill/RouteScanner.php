@@ -36,22 +36,19 @@ class RouteScanner
 
         $modules = $this->container->getModules();
         foreach ($modules as $module) {
-            $instanceResolver = new InstanceResolver($module);
-
+            
             $controllers = $module->getControllers();
             foreach ($controllers as $wrapper) {
                 try {
                     $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
                     $config = $reflectionClass->getMethod('getConfig')->invoke(null);
+
                     $controllerBasePath = isset($config['path'])
                         ? $config['path']
                         : "/";
                     $controllerBasePath = trim($controllerBasePath, '/') . "/";
                     $mapping = isset($config['mapping'])
                         ? $config['mapping']
-                        : [];
-                    $guards = isset($config['guards'])
-                        ? $config['guards']
                         : [];
                     $middlewares = isset($config['middlewares'])
                         ? $config['middlewares']
@@ -63,11 +60,10 @@ class RouteScanner
                     $path = rtrim($basePath . $controllerBasePath, "/") . "/";
 
                     $this->registerRoutes(
-                        $instanceResolver,
+                        $module,
                         $wrapper,
                         $path,
                         $mapping,
-                        $guards,
                         $middlewares,
                         $interceptors
                     );
@@ -83,11 +79,10 @@ class RouteScanner
      * @param InstanceResolver $instanceResolver
      */
     private function registerRoutes(
-        $instanceResolver,
+        Module $module,
         $wrapper,
         $basePath,
         array $mapping,
-        array $guards,
         array $middlewares,
         array $interceptors
     ) {
@@ -100,27 +95,24 @@ class RouteScanner
             }
 
             $route = new Route(
+                $module,
                 $map->requestMethod,
                 $path,
                 [
                     $wrapper->instance,
                     $map->action
                 ],
-                $instanceResolver->resolvePipes($map->pipes),
-                $instanceResolver->resolveGuards(array_merge(
-                    $guards,
-                    $map->guards,
-                )),
-                $instanceResolver->resolveMiddlewares(array_merge(
+                array_merge(
                     $middlewares,
                     $map->middlewares,
-                )),
-                $instanceResolver->resolveInterceptors(array_merge(
+                ),
+                array_merge(
                     $interceptors,
                     $map->interceptors,
-                ))
+                )
             );
 
+            // compile pattern
             $route->compile();
 
             $this->routes[] = $route;
