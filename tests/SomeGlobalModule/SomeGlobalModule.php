@@ -16,6 +16,9 @@ class SomeGlobalModule implements \Hill\IModule {
             'importModules' => [
                 \SomeVendorModule\SomeVendorModule::class,
             ],
+            'controllers' => [
+                \SomeGlobalModule\Controller\SomeGlobalController::class,
+            ]
         ];
     }
 }

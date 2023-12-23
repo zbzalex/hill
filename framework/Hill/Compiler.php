@@ -38,7 +38,11 @@ class Compiler
     {
         $this->dependencyScanner->scan($this->moduleConfigOrClass);
 
-        $modules = $this->container->getModules();
+        $modules = array_merge(
+            $this->container->getModules(),
+            $this->container->getGlobalModules()
+        );
+        
         foreach ($modules as $module) {
             // resolve module instances
             $instanceResolver = new InstanceResolver($module);

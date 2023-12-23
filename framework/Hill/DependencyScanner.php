@@ -62,7 +62,7 @@ class DependencyScanner
                 && is_array($importModuleConfig['exportProviders'])
                 ? $importModuleConfig['exportProviders']
                 : [];
-
+            
             foreach ($exportProviders as $exportProviderClass) {
                 $this->resolveProviderForModule($module, $importModule, $exportProviderClass);
             }
@@ -207,7 +207,7 @@ class DependencyScanner
             $this->scanModuleForImports($module, $importModules);
         } catch (\ReflectionException $e) {
         }
-
+        
         return $module;
     }
 

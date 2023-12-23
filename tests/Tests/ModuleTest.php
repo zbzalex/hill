@@ -27,7 +27,7 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         $routes = $routeScanner->scan("/");
 
         // create request
-        $request = new Request(RequestMethod::GET, "/");
+        $request = new Request(RequestMethod::GET, "/someGlobalModule");
 	
         // handle request and send response
         $requestHandler = new \Hill\RequestHandler($routes, function (\Exception $e) {
@@ -43,5 +43,7 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         if ($response !== null) {
             $response->send();
         }
+        
+        echo $response->status() . "\n";
     }
 }

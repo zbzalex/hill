@@ -41,12 +41,12 @@ class RequestHandler
         try {
             // Матчинг раута
             $route = $this->matcher->match($request);
-
             // Если роут не найден, то выбрасываем http исключение с статусом 404
             if ($route === null)
                 throw new HttpException("Not Found", 404);
 
             $controller = $route->getController();
+
             try {
                 $reflectionClass = new \ReflectionClass($controller[0]);
 

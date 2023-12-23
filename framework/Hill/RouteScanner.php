@@ -34,7 +34,11 @@ class RouteScanner
         // базовый путь приложения всегда должен содержать слэш в конце
         $basePath = rtrim($basePath, '/') . "/";
 
-        $modules = $this->container->getModules();
+        $modules = array_merge(
+            $this->container->getModules(),
+            $this->container->getGlobalModules()
+        );
+        
         foreach ($modules as $module) {
             
             $controllers = $module->getControllers();
@@ -88,7 +92,7 @@ class RouteScanner
     ) {
         foreach ($mapping as $map) {
             /** @var RequestMapping $map */
-
+            
             $path = $basePath . trim($map->path, '/');
             if ($path != "/") {
                 $path = rtrim($path, "/");
