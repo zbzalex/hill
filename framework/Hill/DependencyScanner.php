@@ -35,34 +35,26 @@ class DependencyScanner
 
     private function resolveModules()
     {
-        $globalModules  = $this->container->getGlobalModules();
-        $modules        = $this->container->getModules();
-
-        // resolve global modules
-        foreach ($globalModules as $module) {
-            $this->resolveModuleImports($module, false);
-        }
-
-        // resolve simple modules
+        $modules  = array_merge(
+            $this->container->getGlobalModules(),
+            $this->container->getModules()
+        );
         foreach ($modules as $module) {
             $this->resolveModuleImports($module);
         }
     }
 
-    private function resolveModuleImports(Module $module, $includeGlobalModules = true)
+    private function resolveModuleImports(Module $module)
     {
-        $importModules = $module->getImports();
-        if ($includeGlobalModules) {
-            $importModules = array_merge($this->container->getGlobalModules(), $importModules);
-        }
-
+        $importModules = array_merge($this->container->getGlobalModules(), $module->getImports());
+        
         foreach ($importModules as $importModule) {
             $importModuleConfig = $importModule->getConfig();
             $exportProviders = isset($importModuleConfig['exportProviders'])
                 && is_array($importModuleConfig['exportProviders'])
                 ? $importModuleConfig['exportProviders']
                 : [];
-            
+
             foreach ($exportProviders as $exportProviderClass) {
                 $this->resolveProviderForModule($module, $importModule, $exportProviderClass);
             }
@@ -207,7 +199,7 @@ class DependencyScanner
             $this->scanModuleForImports($module, $importModules);
         } catch (\ReflectionException $e) {
         }
-        
+
         return $module;
     }
 

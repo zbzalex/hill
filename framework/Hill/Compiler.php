@@ -44,7 +44,6 @@ class Compiler
         );
         
         foreach ($modules as $module) {
-            // resolve module instances
             $instanceResolver = new InstanceResolver($module);
             $instanceResolver->resolveInstances();
         }

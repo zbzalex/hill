@@ -34,14 +34,11 @@ class RequestHandler
      */
     public function handle(Request $request)
     {
-        // Ответ
         $response = null;
         $route = null;
 
         try {
-            // Матчинг раута
             $route = $this->matcher->match($request);
-            // Если роут не найден, то выбрасываем http исключение с статусом 404
             if ($route === null)
                 throw new HttpException("Not Found", 404);
 
@@ -56,7 +53,6 @@ class RequestHandler
                     }
                 }
                 
-                // Вызываем обработчик роута
                 $reflectionClass->getMethod($controller[1])->invokeArgs($controller[0], [
                     $request
                 ]);
@@ -64,14 +60,12 @@ class RequestHandler
                 throw new \Hill\HttpException("Internal server error", 500);
             }
         } catch (Result $result) {
-            // Получим результат, который вернёт ответ
             $response = $result->getResponse();
             
             foreach ($route->getInterceptors() as $interceptor) {
                 $response = $interceptor($route->getModule(), $request, $response);
             }
         } catch (\Exception $e) {
-            // Если выброшено исключение - прокидываем его в обработчик ошибок
             $response = call_user_func_array($this->errorHandler, [
                 $e
             ]);
