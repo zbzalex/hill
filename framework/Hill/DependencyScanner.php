@@ -138,7 +138,7 @@ class DependencyScanner
         }
 
         // detect module scope and emplace into module container
-        $module = $moduleConfig['global']
+        $module = isset($moduleConfig['global']) && $moduleConfig['global'] === true
             ? $this->container->emplaceAndGetGlobalModule($moduleClass, $moduleConfig)
             : $this->container->emplaceAndGetModule($moduleClass, $moduleConfig);
 
