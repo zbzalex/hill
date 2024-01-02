@@ -49,28 +49,34 @@ class RequestHandler
 
                 foreach ($route->getMiddlewares() as $middleware) {
                     if (($response = $middleware($route->getModule(), $request)) !== null) {
-                        throw new Result($response);
+                        return $response;
                     }
                 }
-                
-                $reflectionClass->getMethod($controller[1])->invokeArgs($controller[0], [
+
+                $response = $reflectionClass->getMethod($controller[1])->invokeArgs($controller[0], [
                     $request
                 ]);
+                
+                if (is_array($response)) {
+                    $response = new JsonResponse($response);
+                } else if (is_scalar($response)) {
+                    $response = new Response($response);
+                }
+
+                foreach ($route->getInterceptors() as $interceptor) {
+                    $response = $interceptor($route->getModule(), $request, $response);
+                }
+
+                return $response;
             } catch (\ReflectionException $e) {
                 throw new \Hill\HttpException("Internal server error", 500);
             }
-        } catch (Result $result) {
-            $response = $result->getResponse();
-            
-            foreach ($route->getInterceptors() as $interceptor) {
-                $response = $interceptor($route->getModule(), $request, $response);
-            }
         } catch (\Exception $e) {
-            $response = call_user_func_array($this->errorHandler, [
+            return call_user_func_array($this->errorHandler, [
                 $e
             ]);
         }
-        
-        return $response;
+
+        return null;
     }
 }

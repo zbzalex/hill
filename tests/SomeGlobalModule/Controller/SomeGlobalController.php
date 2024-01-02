@@ -2,6 +2,7 @@
 
 namespace SomeGlobalModule\Controller;
 
+use Hill\JsonResponse;
 use Hill\Request;
 use Hill\RequestMapping;
 use Hill\RequestMethod;
@@ -17,8 +18,8 @@ class SomeGlobalController extends \Hill\Controller implements \Hill\IController
     }
 
     public function index(Request $request) {
-        $this->sendJson([
+        return [
            "ok" => true, 
-        ]);
+        ];
     }
 }

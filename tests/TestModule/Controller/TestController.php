@@ -2,6 +2,7 @@
 
 namespace TestModule\Controller;
 
+use Hill\JsonResponse;
 use Hill\Module;
 use Hill\Request;
 use Hill\RequestMapping;
@@ -54,7 +55,7 @@ class TestController extends \Hill\Controller implements \Hill\IController {
     }
 
     public function index(Request $request) {
-        $this->sendJson([
+        return new JsonResponse([
             //'message' => $this->testService_->sayHello(),
             //'message' => $this->someService_->sayHello(),
             //'message' => $this->someGlobalService_->sayHello(),
