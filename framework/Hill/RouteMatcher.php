@@ -19,8 +19,17 @@ class RouteMatcher
     public function match(Request $request)
     {
         foreach ($this->routes as $route) {
-            if ($route->getRequestMethod() != $request->method)
+            if (strpos($route->getRequestMethod(), "|") !== 1) {
+                $methods = array_map(function ($method) {
+                    return strtoupper(trim($method));
+                }, explode("|", $route->getRequestMethod()));
+
+                if (!in_array($request->method, $methods)) {
+                    continue;
+                }
+            } else if ($route->getRequestMethod() != $request->method) {
                 continue;
+            }
 
             if (!preg_match($route->getCompiledPath(), $request->uri, $matches))
                 continue;
@@ -30,7 +39,7 @@ class RouteMatcher
                     $request->attributes[$arg] = $matches[$arg];
                 }
             }
-            
+
             return $route;
         }
 

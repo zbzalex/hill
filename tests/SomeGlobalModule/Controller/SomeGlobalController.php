@@ -12,14 +12,17 @@ class SomeGlobalController extends \Hill\Controller implements \Hill\IController
         return [
             'path' => '/someGlobalModule',
             'mapping' => [
-                new RequestMapping(RequestMethod::GET, "/", "index"),
+                new RequestMapping("GET|POST|PUT", "/", "index"),
             ],
         ];
     }
 
     public function index(Request $request) {
+        
+
         return [
-           "ok" => true, 
+           "ok" => true,
+           //"path" => $request->getUrl(PHP_URL_PATH),
         ];
     }
 }

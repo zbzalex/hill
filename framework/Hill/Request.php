@@ -155,4 +155,9 @@ class Request
 
         return 'http';
     }
+
+    public function getUrl($component = -1)
+    {
+        return parse_url($this->uri, $component);
+    }
 }
