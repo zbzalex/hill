@@ -16,19 +16,19 @@ class TypedArray
         return isset($this->array[$key]);
     }
 
-    public function get(string $key, mixed $default = null)
+    public function get(string $key, $default = null)
     {
         return isset($this->array[$key]) ? $this->array[$key] : $default;
     }
 
-    public function getString(string $key, string $default = null)
+    public function getString(string $key, $default = null)
     {
         $value = $this->get($key, $default);
 
         return is_scalar($value) ? $value : $default;
     }
 
-    public function getInt(string $key, int $default = 0)
+    public function getInt(string $key, $default = 0)
     {
         $value = $this->get($key, $default);
 
@@ -37,7 +37,7 @@ class TypedArray
             : $default;
     }
     
-    public function getFloat(string $key, float $default = 0.0)
+    public function getFloat(string $key, $default = 0.0)
     {
         $value = $this->get($key, $default);
 
@@ -46,7 +46,7 @@ class TypedArray
             : $default;
     }
 
-    public function getBool(string $key, bool $default = false)
+    public function getBool(string $key, $default = false)
     {
         $value = $this->get($key, $default);
 
