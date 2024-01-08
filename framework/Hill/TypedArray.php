@@ -32,7 +32,7 @@ class TypedArray
     {
         $value = $this->get($key, $default);
 
-        return preg_match("/^\d+$/", $key)
+        return preg_match("/^\d+$/", $value)
             ? $value
             : $default;
     }
