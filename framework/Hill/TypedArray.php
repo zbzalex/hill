@@ -5,7 +5,7 @@ namespace Hill;
 class TypedArray
 {
     private array $array;
-    
+
     public function __construct(array $array)
     {
         $this->array = $array;
@@ -32,14 +32,18 @@ class TypedArray
     {
         $value = $this->get($key, $default);
 
-        return is_int($value) ? $value : $default;
+        return preg_match("/^\d+$/", $key)
+            ? $value
+            : $default;
     }
-
+    
     public function getFloat(string $key, float $default = 0.0)
     {
         $value = $this->get($key, $default);
 
-        return is_float($value) ? $value : $default;
+        return preg_match("/^\d+(\.\d+)?$/", $value)
+            ? $value
+            : $default;
     }
 
     public function getBool(string $key, bool $default = false)
