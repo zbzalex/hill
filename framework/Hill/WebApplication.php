@@ -41,9 +41,9 @@ class WebApplication implements IApplication
         $this->container = $container;
         $this->routeScanner = new RouteScanner($container);
         $this->routes = [];
-        $this->errorHandler = function(HttpException $e) {
+        $this->errorHandler = function (HttpException $e) {
             $response = new Response(null);
-            
+
             $response->status($e->getCode());
 
             return $response;
@@ -61,7 +61,8 @@ class WebApplication implements IApplication
     /**
      * @param callable $handler
      */
-    public function setErrorHandler($handler) {
+    public function setErrorHandler($handler)
+    {
         $this->errorHandler = $handler;
     }
 
@@ -71,6 +72,24 @@ class WebApplication implements IApplication
     public function init()
     {
         $this->routes = $this->routeScanner->scan($this->basePath);
+        
+        $modules = array_merge(
+            $this->container->getModules(),
+            $this->container->getGlobalModules()
+        );
+
+        foreach ($modules as $module) {
+            if (
+                !Reflector::implementsInterface(
+                    $module->getModuleClass(),
+                    IOnModuleInit::class
+                )
+            ) continue;
+
+            Reflector::invokeArgs($module->getModuleClass(), "onInit", null, [
+                $module
+            ]);
+        }
     }
 
     /**

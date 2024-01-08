@@ -37,4 +37,30 @@ class Reflector
 
         return [];
     }
+
+    public static function implementsInterface($class, $interface)
+    {
+        try {
+            $reflector = new \ReflectionClass($class);
+
+            return $reflector->implementsInterface($interface);
+        } catch (\ReflectionException $e) {
+        }
+
+        return false;
+    }
+
+    public static function invokeArgs($class, $methodName, $thisObject = null, array $args = [])
+    {
+        try {
+            $reflector = new \ReflectionClass($class);
+
+            $method = $reflector->getMethod($methodName);
+            
+            return $method->invokeArgs($thisObject, $args);
+        } catch (\ReflectionException $e) {
+        }
+
+        return null;
+    }
 }

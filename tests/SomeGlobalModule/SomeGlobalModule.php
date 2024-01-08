@@ -2,7 +2,9 @@
 
 namespace SomeGlobalModule;
 
-class SomeGlobalModule implements \Hill\IModule {
+use Hill\Module;
+
+class SomeGlobalModule implements \Hill\IModule, \Hill\IOnModuleInit {
     public static function create(array $options = []) {
         return [
             'moduleClass' => SomeGlobalModule::class,
@@ -20,5 +22,10 @@ class SomeGlobalModule implements \Hill\IModule {
                 \SomeGlobalModule\Controller\SomeGlobalController::class,
             ]
         ];
+    }
+
+    public function onInit(Module $module)
+    {
+        
     }
 }

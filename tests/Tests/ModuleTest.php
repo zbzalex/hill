@@ -21,7 +21,7 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         // /** @var \TestModule\Service\TestProvider $testService */
         // $testService = $testModule[\TestModule\Service\TestService::class];
         // echo $testService->sayHello();
-
+        
         // scan routes
         $routeScanner = new RouteScanner($container);
         $routes = $routeScanner->scan("/");
