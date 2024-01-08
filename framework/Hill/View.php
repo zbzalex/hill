@@ -9,8 +9,9 @@ class View
 {
     public $path;
     public $extension = '.php';
-    protected $vars = [];
+    private $vars = [];
     private $template;
+    private $helpers = [];
 
     public function __construct($path = '.')
     {
@@ -49,6 +50,11 @@ class View
         }
     }
 
+    public function register(IViewHelper $helper)
+    {
+        $this->helpers[$helper->getName()] = $helper;
+    }
+
     public function render($file, array $data = [])
     {
         $this->template = $this->getTemplate($file);
@@ -59,7 +65,16 @@ class View
 
         if (\is_array($data)) {
             $this->vars = array_merge($this->vars, $data);
+
+            if (isset($this->vars['view'])) {
+                unset($this->vars['view']);
+            }
         }
+        
+        unset($this->template);
+
+        /** @var array $view */
+        $view = $this->helpers;
 
         extract($this->vars);
 
