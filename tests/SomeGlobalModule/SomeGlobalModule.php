@@ -24,7 +24,7 @@ class SomeGlobalModule implements \Hill\IModule, \Hill\IOnModuleInit {
         ];
     }
 
-    public function onInit(Module $module)
+    public static function onInit(Module $module)
     {
         
     }

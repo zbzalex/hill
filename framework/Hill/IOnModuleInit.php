@@ -4,5 +4,5 @@ namespace Hill;
 
 interface IOnModuleInit
 {
-    public function onInit(Module $module);
+    public static function onInit(Module $module);
 }
