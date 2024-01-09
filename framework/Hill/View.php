@@ -55,7 +55,7 @@ class View
         $this->helpers[$helper->getName()] = $helper;
     }
 
-    public function render($file, array $data = [])
+    private function render($file, array $data = [])
     {
         $this->template = $this->getTemplate($file);
 
@@ -63,21 +63,23 @@ class View
             throw new \Exception("Template file not found: {$this->template}.");
         }
 
+        unset($file);
+
         if (\is_array($data)) {
             $this->vars = array_merge($this->vars, $data);
 
             if (isset($this->vars['view'])) {
                 unset($this->vars['view']);
             }
+
+            unset($data);
         }
         
-        unset($this->template);
-
         /** @var array $view */
         $view = $this->helpers;
 
         extract($this->vars);
-
+        
         include $this->template;
     }
 
@@ -90,12 +92,12 @@ class View
         return ob_get_clean();
     }
 
-    public function exists($file)
+    private function exists($file)
     {
         return file_exists($this->getTemplate($file));
     }
 
-    public function getTemplate($file)
+    private function getTemplate($file)
     {
         $ext = $this->extension;
 
@@ -112,6 +114,6 @@ class View
 
     public function e($str)
     {
-        return htmlentities($str);
+        return htmlentities($str, ENT_QUOTES);
     }
 }
