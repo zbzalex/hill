@@ -47,6 +47,9 @@ class Injector
                 );
 
             $wrapper->instance = call_user_func_array($wrapper->factory[0], $wrapper->factory[1]);
+
+            $this->registry->set($wrapper->instanceClass, $wrapper->instance);
+            
             return $wrapper->instance;
         }
 
