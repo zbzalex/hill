@@ -7,29 +7,38 @@ namespace Hill;
  */
 class Injector
 {
-    /**
-     * @var Module $module
-     */
-    private $module;
+    /** @var Registry $registry */
+    private $registry;
 
     /**
-     * @param Module $module
+     * Constructor
+     * 
+     * @param Registry $registry
      */
-    public function __construct(Module $module)
+    public function __construct(Registry $registry)
     {
-        $this->module = $module;
+        $this->registry = $registry;
     }
 
     /**
+     * @param Module $module
      * @param InstanceWrapper $wrapper
      * 
      * @return object|null
      */
     public function resolveInstance(
+        Module $module,
         InstanceWrapper $wrapper
     ) {
-        if ($wrapper->instance !== null)
+        if ($wrapper->instance !== null) {
             return $wrapper->instance;
+        }
+
+        if (($instance = $this->registry->get($wrapper->instanceClass)) !== null) {
+            $wrapper->instance = $instance;
+
+            return $wrapper->instance;
+        }
 
         if ($wrapper->factory !== null) {
             if (count($wrapper->factory) != 2)
@@ -41,8 +50,8 @@ class Injector
             return $wrapper->instance;
         }
 
-        $providers = $this->module->getProviders();
-        
+        $providers = $module->getProviders();
+
         try {
             $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
             $constructor = $reflectionClass->getConstructor();
@@ -65,12 +74,14 @@ class Injector
 
                         if (!isset($providers[$paramClass])) {
                             throw new \Exception(sprintf(
-                                "Unresolved instance '%s' in module '%s'", $paramClass, $this->module->getModuleClass()
+                                "Unresolved instance '%s' in module '%s'",
+                                $paramClass,
+                                $module->getModuleClass()
                             ));
                         }
 
                         $provider = $providers[$paramClass];
-                        $instance = $this->resolveInstance($provider);
+                        $instance = $this->resolveInstance($module, $provider);
 
                         $args[] = $instance;
                     }
@@ -81,27 +92,12 @@ class Injector
                 $wrapper->instance = $reflectionClass->newInstanceWithoutConstructor();
             }
 
+            $this->registry->set($wrapper->instanceClass, $wrapper->instance);
+
             return $wrapper->instance;
         } catch (\ReflectionException $e) {
         }
 
         return null;
-    }
-
-    /**
-     * @param string $someClass
-     * 
-     * @return bool
-     */
-    public static function isInjectable($someClass)
-    {
-        try {
-            $reflectionClass = new \ReflectionClass($someClass);
-
-            return $reflectionClass->implementsInterface(IInjectable::class);
-        } catch (\ReflectionException $e) {
-        }
-        
-        return false;
     }
 }

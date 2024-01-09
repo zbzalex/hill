@@ -7,36 +7,33 @@ namespace Hill;
  */
 class InstanceResolver
 {
-    /**
-     * @var Module $module The module
-     */
-    private $module;
-
-    /**
-     * @var Injector $injector Dependency injector
-     */
+    /** @var Injector $injector */
     private $injector;
 
     /**
-     * @param Module $module
+     * Constructor
+     * 
+     * @param Injector $injector
      */
-    public function __construct(Module $module)
+    public function __construct(Injector $injector)
     {
-        $this->module = $module;
-        $this->injector = new Injector($module);
+        $this->injector = $injector;
     }
 
-    public function resolveInstances()
+    /**
+     * Resolve instances
+     * 
+     * @param Module $module
+     */
+    public function resolveInstances(Module $module)
     {
-        $providers      = $this->module->getProviders();
-        $controllers    = $this->module->getControllers();
+        $unresolvedInstanceWrappers = array_merge(
+            $module->getProviders(),
+            $module->getControllers()
+        );
 
-        foreach ($providers as $provider) {
-            $this->injector->resolveInstance($provider);
-        }
-
-        foreach ($controllers as $controller) {
-            $this->injector->resolveInstance($controller);
+        foreach ($unresolvedInstanceWrappers as $instanceWrapper) {
+            $this->injector->resolveInstance($module, $instanceWrapper);
         }
     }
 }

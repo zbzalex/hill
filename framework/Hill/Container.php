@@ -28,7 +28,7 @@ class Container
      * 
      * @return Module|null
      */
-    public function emplaceAndGetModule($moduleClass, array $config = [])
+    public function addModule($moduleClass, array $config = [])
     {
         $module = new Module($moduleClass, $config);
 
@@ -37,7 +37,7 @@ class Container
         return $module;
     }
 
-    public function emplaceAndGetGlobalModule($moduleClass, array $config = [])
+    public function addGlobalModule($moduleClass, array $config = [])
     {
         $module = new Module($moduleClass, $config);
 

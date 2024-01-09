@@ -5,6 +5,8 @@ namespace SomeGlobalModule\Service;
 class SomeGlobalService implements \Hill\IInjectable
 {
     private $someVendorService_;
+
+    public $val = null;
     
     public function __construct(
         \SomeVendorModule\Service\SomeVendorService $someVendorService

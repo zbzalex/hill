@@ -68,6 +68,7 @@ class Request
     public $length;
 
     /**
+     * Constructor
      * 
      */
     public function __construct(
@@ -115,6 +116,9 @@ class Request
         );
     }
 
+    /**
+     * @return array
+     */
     private static function resolveGlobalHeaders()
     {
         $headers = [];
@@ -132,6 +136,9 @@ class Request
         return $headers;
     }
 
+    /**
+     * @return string
+     */
     private function getBody()
     {
         $body = null;
@@ -146,7 +153,10 @@ class Request
 
         return $body;
     }
-
+    
+    /**
+     * @return string
+     */
     private static function getScheme()
     {
         if (isset($_SERVER['HTTPS']) && 'on' === strtolower($_SERVER['HTTPS'])) {
@@ -156,6 +166,11 @@ class Request
         return 'http';
     }
 
+    /**
+     * @param int $component
+     * 
+     * @return array|string
+     */
     public function getUrl($component = -1)
     {
         return parse_url($this->uri, $component);

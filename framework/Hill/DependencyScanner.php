@@ -25,29 +25,39 @@ class DependencyScanner
     /**
      * Scan modules
      * 
-     * @param array $rootModuleConfig
+     * @param array $rootModuleConfigOrClass
      */
     public function scan($rootModuleConfigOrClass)
     {
-        $this->scanForModules($rootModuleConfigOrClass);
+        $this->scanModule($rootModuleConfigOrClass);
         $this->resolveModules();
     }
 
+    /**
+     * 
+     */
     private function resolveModules()
     {
         $modules  = array_merge(
             $this->container->getGlobalModules(),
             $this->container->getModules()
         );
+
         foreach ($modules as $module) {
             $this->resolveModuleImports($module);
         }
     }
 
+    /**
+     * 
+     */
     private function resolveModuleImports(Module $module)
     {
-        $importModules = array_merge($this->container->getGlobalModules(), $module->getImports());
-        
+        $importModules = array_merge(
+            $this->container->getGlobalModules(),
+            $module->getImports()
+        );
+
         foreach ($importModules as $importModule) {
             $importModuleConfig = $importModule->getConfig();
             $exportProviders = isset($importModuleConfig['exportProviders'])
@@ -56,7 +66,7 @@ class DependencyScanner
                 : [];
 
             foreach ($exportProviders as $exportProviderClass) {
-                $this->resolveProviderForModule($module, $importModule, $exportProviderClass);
+                $this->resolveProviderDeps($module, $importModule, $exportProviderClass);
             }
         }
     }
@@ -101,8 +111,9 @@ class DependencyScanner
      * 
      * @return Module
      */
-    private function scanForModules($moduleConfigOrClass)
-    {
+    private function scanModule(
+        $moduleConfigOrClass
+    ) {
         $moduleConfig = [];
 
         // resolve module
@@ -129,12 +140,24 @@ class DependencyScanner
             return $module;
         }
 
-        // detect module scope and emplace into module container
-        $module = isset($moduleConfig['global']) && $moduleConfig['global'] === true
-            ? $this->container->emplaceAndGetGlobalModule($moduleClass, $moduleConfig)
-            : $this->container->emplaceAndGetModule($moduleClass, $moduleConfig);
+        $isGlobal = isset($moduleConfig['global'])
+            && $moduleConfig['global'] === true;
 
-        // scan module for dependencies
+        // detect module scope and emplace into module container
+        if ($isGlobal) {
+            $this->container->addGlobalModule(
+                $moduleClass,
+                $moduleConfig
+            );
+        } else {
+            $this->container->addModule(
+                $moduleClass,
+                $moduleConfig
+            );
+        }
+
+        $module = $this->container->getModule($moduleClass);
+
         try {
             $providers = isset($moduleConfig['providers'])
                 && is_array($moduleConfig['providers'])
@@ -146,6 +169,7 @@ class DependencyScanner
                 ? $moduleConfig['controllers']
                 : [];
 
+            //// providers
             foreach ($providers as $providerConfigOrClass) {
                 try {
                     $factory = null;
@@ -176,14 +200,13 @@ class DependencyScanner
                 }
             }
 
+            //// controllers
             foreach ($controllers as $controllerClass) {
                 if ($controllerClass === null)
                     continue;
 
                 try {
-                    $reflectionClass = new \ReflectionClass($controllerClass);
-                    if (!$reflectionClass->implementsInterface(IController::class))
-                        continue;
+                    if (!Reflector::implementsInterface($controllerClass, IController::class)) continue;
 
                     $module->addController($controllerClass);
                 } catch (\ReflectionException $e) {
@@ -203,27 +226,39 @@ class DependencyScanner
         return $module;
     }
 
-    private function scanModuleForImports(Module $module, array $importModules)
+    /**
+     * Scan source module for import modules
+     * 
+     * @param Module    $module         Source module
+     * @param Module[]  $importModules  Source module imports
+     */
+    private function scanModuleForImports(Module $module, array $importModules = [])
     {
         foreach ($importModules as $importModuleConfigOrClass) {
             $importModuleConfig = [];
 
+            $mod = null;
+
             if (is_array($importModuleConfigOrClass)) {
                 $importModuleConfig = $importModuleConfigOrClass;
             } else {
+
+                // fix bug with null module class
                 if ($importModuleConfigOrClass === null)
                     continue;
 
-                if (($importModule_ = $this->container->getModule($importModuleConfigOrClass)) !== null) {
-                    $importModuleConfig = $importModule_->getConfig();
-                } else {
+                $mod = $this->container->getModule($importModuleConfigOrClass);
+                if ($mod === null) {
                     $importModuleConfig = self::createModuleForClass($importModuleConfigOrClass);
                 }
             }
 
-            $importModule = $this->scanForModules($importModuleConfig);
-            if (!isset($importModuleConfig['global']) || !$importModuleConfig['global']) {
-                $module->addImport($importModule);
+            if ($mod === null) {
+                $mod = $this->scanModule($importModuleConfig);
+            }
+
+            if (!$mod->isGlobal()) {
+                $module->addImport($mod);
             }
         }
     }
@@ -231,13 +266,16 @@ class DependencyScanner
     /**
      * Resolve provider dependencies for module
      * 
-     * @param Module $module            The module
-     * @param Module $importModule      Related module
-     * @param string $providerClass     Provider class
+     * @param Module $module            src module
+     * @param Module $importModule      dst module
+     * @param string $providerClass     provider class
      */
-    private function resolveProviderForModule(Module $module, Module $importModule, $providerClass)
-    {
-        $providers = $importModule->getProviders();
+    private function resolveProviderDeps(
+        Module $src,
+        Module $dst,
+        string $providerClass
+    ) {
+        $providers = $dst->getProviders();
         if (isset($providers[$providerClass])) {
 
             $provider = $providers[$providerClass];
@@ -247,13 +285,13 @@ class DependencyScanner
                 try {
                     $deps = Reflector::getConstructorArgs($providerClass);
                     foreach ($deps as $depProviderClass) {
-                        $this->resolveProviderForModule($module, $importModule, $depProviderClass);
+                        $this->resolveProviderDeps($src, $dst, $depProviderClass);
                     }
                 } catch (\ReflectionException $e) {
                 }
             }
 
-            $module->addProvider($providerClass, $provider->factory);
+            $src->addProvider($providerClass, $provider->factory);
         }
     }
 }
