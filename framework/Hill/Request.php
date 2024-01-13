@@ -26,7 +26,7 @@ class Request
      * @var array $attributes Attributes array
      */
     public $attributes = [];
-    
+
     /**
      * @var array $query _GET array
      */
@@ -46,7 +46,7 @@ class Request
      * @var array $files Files array
      */
     public $files;
-    
+
     /**
      * @var bool $secure Secure flag
      */
@@ -153,7 +153,7 @@ class Request
 
         return $body;
     }
-    
+
     /**
      * @return string
      */
@@ -174,5 +174,20 @@ class Request
     public function getUrl($component = -1)
     {
         return parse_url($this->uri, $component);
+    }
+
+    public function getQuery()
+    {
+        return new TypedArray($this->query);
+    }
+
+    public function getData()
+    {
+        return new TypedArray($this->data);
+    }
+
+    public function getAttributes()
+    {
+        return new TypedArray($this->attributes);
     }
 }
