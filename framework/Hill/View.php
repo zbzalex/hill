@@ -5,7 +5,7 @@ namespace Hill;
 /**
  * Simple view class
  */
-class View
+class View implements \ArrayAccess
 {
     public $path;
     public $extension = '.php';
@@ -74,12 +74,12 @@ class View
 
             unset($data);
         }
-        
+
         /** @var array $view */
-        $view = $this->helpers;
+        $view = $this;
 
         extract($this->vars);
-        
+
         include $this->template;
     }
 
@@ -111,9 +111,32 @@ class View
 
         return $this->path . '/' . $file;
     }
-
+    
     public function e($str)
     {
         return htmlentities($str, ENT_QUOTES);
+    }
+
+    public function offsetExists(mixed $key): bool
+    {
+        return isset($this->helpers[$key]);
+    }
+
+    public function offsetGet(mixed $key): mixed
+    {
+        return isset($this->helpers[$key])
+            ? $this->helpers[$key]
+            : null;
+    }
+
+    public function offsetSet(mixed $key, mixed $val): void
+    {
+        // 
+    }
+
+
+    public function offsetUnset(mixed $key): void
+    {
+        // 
     }
 }
