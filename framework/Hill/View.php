@@ -111,31 +111,31 @@ class View implements \ArrayAccess
 
         return $this->path . '/' . $file;
     }
-    
+
     public function e($str)
     {
         return htmlentities($str, ENT_QUOTES);
     }
 
-    public function offsetExists(mixed $key): bool
+    public function offsetExists($key)
     {
         return isset($this->helpers[$key]);
     }
 
-    public function offsetGet(mixed $key): mixed
+    public function offsetGet($key)
     {
         return isset($this->helpers[$key])
             ? $this->helpers[$key]
             : null;
     }
 
-    public function offsetSet(mixed $key, mixed $val): void
+    public function offsetSet($key, $val)
     {
         // 
     }
 
 
-    public function offsetUnset(mixed $key): void
+    public function offsetUnset($key)
     {
         // 
     }
