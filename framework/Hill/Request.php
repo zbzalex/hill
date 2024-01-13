@@ -185,9 +185,4 @@ class Request
     {
         return new TypedArray($this->data);
     }
-
-    public function getAttributes()
-    {
-        return new TypedArray($this->attributes);
-    }
 }
