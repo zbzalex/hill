@@ -36,6 +36,8 @@ class RouteMatcher
 
             if (count($route->getArgs()) != 0) {
                 foreach ($route->getArgs() as $arg) {
+                    if (!isset($matches[$arg])) continue;
+                    
                     $request->attributes[$arg] = $matches[$arg];
                 }
             }

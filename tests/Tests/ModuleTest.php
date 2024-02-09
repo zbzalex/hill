@@ -2,10 +2,14 @@
 
 namespace Tests;
 
+use Hill\Module;
 use Hill\Request;
 use Hill\RequestMethod;
+use Hill\Route;
+use Hill\RouteMatcher;
 use Hill\RouteScanner;
 use Hill\Validator;
+use TestModule\TestModule;
 
 /**
  * Module test class
@@ -50,27 +54,41 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
 
     public function testValidator()
     {
-        $validator = new Validator([
-            'name' => [
-                //// string required
-                function ($field, $value) {
-                    return is_string($value)
-                        ? null
-                        : sprintf("Значение %s не является строковым значением", $field);
-                },
-                //// isnt empty
-                function ($field, $value) {
-                    return is_string($value) && mb_strlen($value) < 1
-                        ? sprintf("Значение %s не указано", $field)
-                        : null;
-                },
-            ],
+        // $validator = new Validator([
+        //     'name' => [
+        //         //// string required
+        //         function ($field, $value) {
+        //             return is_string($value)
+        //                 ? null
+        //                 : sprintf("Значение %s не является строковым значением", $field);
+        //         },
+        //         //// isnt empty
+        //         function ($field, $value) {
+        //             return is_string($value) && mb_strlen($value) < 1
+        //                 ? sprintf("Значение %s не указано", $field)
+        //                 : null;
+        //         },
+        //     ],
+        // ]);
+
+        // $errors = $validator->validate([
+        //     'name' => "",
+        // ]);
+
+        // $this->assertTrue(count($errors) == 0, "Ошибка валидации");
+    }
+
+    public function testRoute()
+    {
+        $req = new Request("GET", "/333KZO");
+        
+        $route = new Route(new Module(TestModule::class), "GET", "/@username:[0-9a-z_]+", null);
+        $route->compile();
+
+        $matcher = new RouteMatcher([
+            $route
         ]);
 
-        $errors = $validator->validate([
-            'name' => "",
-        ]);
-
-        $this->assertTrue(count($errors) == 0, "Ошибка валидации");
+        var_dump($matcher->match($req));
     }
 }

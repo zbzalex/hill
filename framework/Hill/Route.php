@@ -52,9 +52,9 @@ class Route
         Module $module,
         $requestMethod,
         $path,
-        $controller,
-        $middlewares,
-        $interceptors
+        $controller = null,
+        array $middlewares = [],
+        array $interceptors = []
     ) {
         $this->module = $module;
         $this->requestMethod = $requestMethod;
@@ -66,32 +66,45 @@ class Route
     }
 
     /**
-     * 
+     * Compile regex string
      */
     public function compile()
     {
         $that = $this;
 
-        $path = str_replace("/", "\/", $this->path) . "\/?";
-        
+        $lastChar = substr($this->path, -1);
+        $path = str_replace(["/", ")"], ["\/", ")?"], $this->path);
+
         // match params
-        $path = preg_replace_callback("/:(\w+)/", function ($matches) use ($that) {
+        $path = preg_replace_callback("/@([\w]+)(:([^\/\(\)]*))?/", function ($matches) use ($that) {
             $that->args[] = $matches[1];
-            return "(?P<" . $matches[1] . ">[a-z0-9_]+)";
+
+            if (isset($matches[3])) {
+                return '(?P<' . $matches[1] . '>' . $matches[3] . ')';
+            }
+
+            return "(?P<" . $matches[1] . ">[^/\?]+)";
         }, $path);
 
-        $path = "/"
+        if ($lastChar == '/') {
+            $path .= "?";
+        } else {
+            $path .= "\/?";
+        }
+
+        $this->compiledPath = "/"
             . "^"    // start
             . $path
             . "(?:\?.*)?"
             . "$"   // end
             . "/i"  // flags
         ;
-
-        $this->compiledPath = $path;
     }
 
-    public function getModule() { return $this->module; }
+    public function getModule()
+    {
+        return $this->module;
+    }
 
     /**
      * 
@@ -118,7 +131,9 @@ class Route
     }
 
     /**
+     * Returns compiled regex string
      * 
+     * @return string
      */
     public function getCompiledPath()
     {
@@ -133,11 +148,13 @@ class Route
         return $this->args;
     }
 
-    public function getMiddlewares() {
+    public function getMiddlewares()
+    {
         return $this->middlewares;
     }
 
-    public function getInterceptors() {
+    public function getInterceptors()
+    {
         return $this->interceptors;
     }
 }
