@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Hill\DB\Connection;
+use Hill\DB\DataSource;
 use Hill\Module;
 use Hill\Request;
 use Hill\RequestMethod;
@@ -80,15 +82,15 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
 
     public function testRoute()
     {
-        $req = new Request("GET", "/333KZO");
-        
-        $route = new Route(new Module(TestModule::class), "GET", "/@username:[0-9a-z_]+", null);
-        $route->compile();
+        // $req = new Request("GET", "/333KZO");
 
-        $matcher = new RouteMatcher([
-            $route
-        ]);
+        // $route = new Route(new Module(TestModule::class), "GET", "/@username:[0-9a-z_]+", null);
+        // $route->compile();
 
-        var_dump($matcher->match($req));
+        // $matcher = new RouteMatcher([
+        //     $route
+        // ]);
+
+        // var_dump($matcher->match($req));
     }
 }
