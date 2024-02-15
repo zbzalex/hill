@@ -462,8 +462,7 @@ class QueryBuilder
                     } else {
 
                         // call default operator
-                        call_user_func([$this, 'eq'],$field, $expression);
-
+                        call_user_func([$this, 'eq'], $field, $expression);
                     }
                 }
 
@@ -492,13 +491,18 @@ class QueryBuilder
 
         if (isset($options['having'])) {
             if (is_array($options['having'])) {
+                if (count($options['having']) > 0) {
+                    // having condition
+                    $this->having[] = $options['having'][0];
 
-                // having condition
-                $this->having[] = $options['having'][0];
-
-                // bindings
-                foreach ($options['having'][1] as $k => $v) {
-                    $this->bindings[$k] = $v;
+                    if (
+                        count($options['having']) > 1
+                        && is_array($options['having'][1])
+                    ) {
+                        foreach ($options['having'][1] as $k => $v) {
+                            $this->bindings[$k] = $v;
+                        }
+                    }
                 }
             } else {
                 $this->having[] = $options['having'];
