@@ -28,7 +28,7 @@ class Repository
      * @var string $primaryKey Table sequence name
      */
     protected $primaryKey = "id";
-    
+
     /**
      * Constructor
      * 
@@ -58,17 +58,17 @@ class Repository
     /**
      * Returns results entities
      * 
-     * @param callable $fn
+     * @param array $findOptions
      * 
      * @return Entity[]
      */
-    public function find(array $options = [])
+    public function find(array $findOptions = [])
     {
         $results = [];
 
         $rows = $this->createQueryBuilder()
-            ->setFindOptions($options)
-            ->getMany($options);
+            ->setFindOptions($findOptions)
+            ->getMany();
 
         foreach ($rows as $row) {
             try {
@@ -103,14 +103,14 @@ class Repository
     /**
      * Returns single result entity
      * 
-     * @param array $options find options
+     * @param array $findOptions find options
      * 
      * @return Entity found entity
      */
-    public function findOne(array $options = [])
+    public function findOne(array $findOptions = [])
     {
         $row = $this->createQueryBuilder()
-            ->setFindOptions($options)
+            ->setFindOptions($findOptions)
             ->getOne();
 
         if ($row === null)
@@ -154,18 +154,15 @@ class Repository
 
         if ($entity->isModified()) {
             if ($entity->isNew()) {
-                $entity->__set(
+                $entity->set(
                     $this->primaryKey,
                     $queryBuilder->insert($entity->getModified())
                 );
             } else {
                 $queryBuilder
-                    ->where(sprintf("%s = :seq", $this->primaryKey))
-                    ->bind([
-                        'seq' => $entity->get($this->primaryKey) !== null
-                            ?    $entity->get($this->primaryKey)
-                            :    0,
-                    ])
+                    ->eq($this->primaryKey, $entity->get($this->primaryKey) !== null
+                        ? $entity->get($this->primaryKey)
+                        : 0)
                     ->update($entity->getModified());
             }
 
@@ -185,11 +182,9 @@ class Repository
         if ($entity !== null && !$entity->isNew()) {
             $queryBuilder
                 ->where(sprintf("%s = :seq", $this->primaryKey))
-                ->bind([
-                    'seq' => $entity->get($this->primaryKey) !== null
-                        ?    $entity->get($this->primaryKey)
-                        :    0
-                ])
+                ->eq($this->primaryKey, $entity->get($this->primaryKey) !== null
+                    ? $entity->get($this->primaryKey)
+                    : 0)
                 ->delete();
         }
     }

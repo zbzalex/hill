@@ -93,4 +93,32 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
 
         // var_dump($matcher->match($req));
     }
+
+    public function testDB()
+    {
+        $connection = new Connection(
+            new \PDO("mysql:host=localhost;dbname=test", "root", "123")
+        );
+
+        $databSource = new DataSource($connection);
+
+        $result = $databSource
+            ->createQueryBuilder("users")
+            ->setFindOptions([
+                'where' => [
+                    [
+                        'id' => 1,
+                        'username'  => 'admin',
+                    ],
+                    [
+                        'id' => 2,
+                    ]
+                ],
+            ])
+            ->getOne();
+
+        if ($result !== null) {
+            echo sprintf("Hello, %s!", $result['username']);
+        }
+    }
 }

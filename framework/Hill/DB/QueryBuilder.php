@@ -85,7 +85,7 @@ class QueryBuilder
     /**
      * Constructor
      * 
-     * @param Connection $connection
+     * @param Connection $connection Connection
      * @param string|null $table Table name
      * @param string|null $alias Table alias
      */
@@ -127,6 +127,21 @@ class QueryBuilder
     /**
      * Join table
      * 
+     * Example:
+     * 
+     * $result = $dataSource
+     *  ->createQueryBuilder("users_friends", "uf")
+     *  ->select([
+     *      'uf.id as friend_id',
+     *      'u.*',
+     *  ])
+     *  ->join("users", "u", "u.id = uf.friend_id", "left")
+     *  ->getOne();
+     * 
+     * if ($result !== null) {
+     *      echo sprintf("Hello, %s!", $result['username']);
+     * }
+     * 
      * @param string $table Table name
      * @param string $alias Table alias
      * @param string $condition Join condition
@@ -143,6 +158,8 @@ class QueryBuilder
 
     /**
      * Left join
+     * 
+     * @see QueryBuilder::join()
      * 
      * @param string $table Table name
      * @param string $alias Table alias
@@ -163,11 +180,31 @@ class QueryBuilder
         return $this;
     }
 
+    /**
+     * Calls operator
+     * 
+     * Example:
+     * 
+     * $result = $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->select([ 'username' ])
+     *  ->eq("id", 1)
+     *  ->wrap()
+     *  ->getOne();
+     * 
+     * if ($result !== null) {
+     *      echo sprintf("Hello, %s!", $result['username']);
+     * }
+     * 
+     * @return QueryBuilder
+     */
     public function __call($name, array $args)
     {
         if (array_key_exists($name, $this->operators)) {
             if (count($args) > 0) {
+
                 $field = $args[0];
+
                 $value = count($args) > 1 ? $args[1] : null;
 
                 if (in_array($name, [
@@ -189,7 +226,7 @@ class QueryBuilder
                         );
                     } else if ($value !== null) {
                         $placeholder = sprintf(
-                            "binding%d",
+                            "placeholder%d",
                             count($this->bindings)
                         );
 
@@ -256,14 +293,14 @@ class QueryBuilder
     /**
      * Order by expression
      * 
-     * @param string $expression Expression
-     * @param string $order desc|asc
+     * @param string $field Field
+     * @param string $order Order (desc or asc)
      * 
      * @return QueryBuilder
      */
-    public function orderBy($expression, $order = "desc")
+    public function orderBy($field, $order = "desc")
     {
-        $this->orderBy[] = sprintf("%s %s", $expression, $order);
+        $this->orderBy[] = sprintf("%s %s", $field, $order);
 
         return $this;
     }
@@ -364,6 +401,38 @@ class QueryBuilder
     /**
      * Sets find options
      * 
+     * Example:
+     * 
+     * $result = $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->setFindOptions([
+     *      'select' => [
+     *          'username',
+     *      ],
+     *      'where'  => [
+     *          [
+     *              'id' => 1,
+     *          ],
+     *          // or
+     *          [
+     *              'username' => 'admin',
+     *          ],
+     *          // or
+     *          [
+     *              'access_level' => ['ge', 9],
+     *          ]
+     *      ],
+     *      'orderBy'   => [
+     *          'id'    => 'desc',
+     *      ],
+     *      'offset' => 0,
+     *  ])
+     *  ->getOne();
+     * 
+     * if ($result !== null) {
+     *      echo sprintf("Hello, %s!", $result['username']);
+     * }
+     * 
      * @param array $options Find options
      * 
      * @return QueryBuilder
@@ -374,23 +443,49 @@ class QueryBuilder
             ? $options['select']
             : [];
 
-        if (isset($options['where'])) {
-            if (is_array($options['where']) && count($options['where']) > 0) {
-                // sql
-                $this->where[] = $options['where'][0];
+        if (isset($options['where']) && is_array($options['where'])) {
 
-                // bindings
-                if (count($options['where']) > 1 && is_array($options['where'][1])) {
-                    $this->bindings = $options['where'][1];
+            $i = 0;
+
+            foreach ($options['where'] as $condition) {
+                if (!is_array($condition)) continue;
+
+                foreach ($condition as $field => $expression) {
+
+                    if (is_array($expression)) {
+                        $op     = $expression[0];
+                        $value  = isset($expression[1])
+                            ? $expression[1]
+                            : null;
+
+                        call_user_func([$this, $op], $field, $value);
+                    } else {
+
+                        // call default operator
+                        call_user_func([$this, 'eq'],$field, $expression);
+
+                    }
                 }
-            } else {
-                $this->where[] = $options['where'];
+
+                if ($i == 0) {
+                    $this->wrap();
+                } else {
+                    $this->wrapOr();
+                }
+
+                $i++;
             }
         }
 
-        $this->orderBy  = isset($options['orderBy'])
-            ? $options['orderBy']
-            : [];
+        if (
+            isset($options['orderBy'])
+            && is_array($options['orderBy'])
+        ) {
+            foreach ($options['orderBy'] as $field => $order) {
+                $this->orderBy[] = sprintf("%s %s", $field, $order);
+            }
+        }
+
         $this->groupBy  = isset($options['groupBy'])
             ? $options['groupBy']
             : [];
@@ -494,6 +589,17 @@ class QueryBuilder
     /**
      * Returns list of results
      * 
+     * Example:
+     * 
+     * $results = $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->ge("access_level", 9)
+     *  ->getMany();
+     * 
+     * if (count($results) > 0) {
+     *      // 
+     * }
+     * 
      * @return array
      */
     public function getMany()
@@ -510,7 +616,22 @@ class QueryBuilder
     /**
      * Returns single result
      * 
-     * @return array
+     * Example:
+     * 
+     * $result = $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->select([
+     *      'username'
+     *  ])
+     *  ->eq("id", 1)
+     *  ->wrap()
+     *  ->getOne();
+     *
+     * if ($result !== null) {
+     *      echo sprintf("Hello, %s!", $result['username']);
+     * }
+     * 
+     * @return array|null
      */
     public function getOne()
     {
@@ -526,6 +647,14 @@ class QueryBuilder
     /**
      * Returns results count
      * 
+     * Example:
+     * 
+     * $count = $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->count();
+     * 
+     * echo sprintf("users count: %d", $count);
+     * 
      * @return int
      */
     public function count()
@@ -540,6 +669,16 @@ class QueryBuilder
 
     /**
      * Update data
+     * 
+     * Example:
+     * 
+     * $dataSource
+     *  ->createQueryBuilder()
+     *  ->eq("id", 1)
+     *  ->wrap()
+     *  ->update([
+     *      'access_level' => 9,
+     *  ]);
      * 
      * @param array $data Update data
      */
@@ -578,6 +717,16 @@ class QueryBuilder
 
     /**
      * Insert data and returns insert id
+     * 
+     * Example:
+     * 
+     * $id = $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->insert([
+     *      'username'  => 'admin',
+     *  ]);
+     * 
+     * echo sprintf("new user id: %d", $id);
      * 
      * @param array $data Insert data
      * 
@@ -624,6 +773,14 @@ class QueryBuilder
 
     /**
      * Delete entity
+     * 
+     * Example:
+     * 
+     * $dataSource
+     *  ->createQueryBuilder("users")
+     *  ->eq("id", 1)
+     *  ->wrap()
+     *  ->delete();
      * 
      * @return QueryBuilder
      */
