@@ -2,7 +2,15 @@
 
 namespace Hill;
 
+/**
+ * On module init interface
+ */
 interface IOnModuleInit
 {
-    public static function onInit(Module $module);
+    /**
+     * Handle module init
+     * 
+     * @param Module $module The module
+     */
+    public static function onInit(Module $module): void;
 }

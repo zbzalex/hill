@@ -7,10 +7,17 @@ namespace Hill;
  */
 class Test
 {
-    public static function createTestModule($moduleConfigOrClass)
+    /**
+     * Creates container from input module
+     * 
+     * @param array|string $moduleConfigOrClass
+     * 
+     * @return Container
+     */
+    public static function createTestModule($moduleConfigOrClass): Container
     {
         $compiler = new Compiler($moduleConfigOrClass);
-        
+
         return $compiler->compile();
     }
 }

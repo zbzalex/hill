@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Hill\DB\Connection;
-use Hill\DB\DataSource;
 use Hill\Module;
 use Hill\Request;
 use Hill\RequestMethod;
@@ -11,7 +9,6 @@ use Hill\Route;
 use Hill\RouteMatcher;
 use Hill\RouteScanner;
 use Hill\Validator;
-use TestModule\TestModule;
 
 /**
  * Module test class
@@ -20,105 +17,41 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
 {
     public function testModule()
     {
-        // /** @var \Hill\Container $container */
-        // $container = \Hill\Test::createTestModule(\TestModule\TestModule::class);
-        // /** @var \Hill\Module $testModule */
-        // $testModule = $container->getModule(\TestModule\TestModule::class);
+        /** @var \Hill\Container $container */
+        $container = \Hill\Test::createTestModule(\Module\UsersModule::class);
 
-        // // /** @var \TestModule\Service\TestProvider $testService */
-        // // $testService = $testModule[\TestModule\Service\TestService::class];
-        // // echo $testService->sayHello();
+        // scan routes
+        $routeScanner = new RouteScanner($container);
+        $routes = $routeScanner->scan("/");
 
-        // // scan routes
-        // $routeScanner = new RouteScanner($container);
-        // $routes = $routeScanner->scan("/");
+        // create request
+        $request = new Request(RequestMethod::GET, "/users");
 
-        // // create request
-        // $request = new Request(RequestMethod::GET, "/someGlobalModule");
+        // handle request and send response
+        $requestHandler = new \Hill\RequestHandler($routes, function (\Exception $e) {
+            if ($e instanceof \Hill\HttpException) {
+                // TODO: ..
+            }
+            $response = new \Hill\Response(null);
+            $response->status($e->getCode());
+            return $response;
+        });
 
-        // // handle request and send response
-        // $requestHandler = new \Hill\RequestHandler($routes, function (\Exception $e) {
-        //     if ($e instanceof \Hill\HttpException) {
-        //         // TODO: ..
-        //     }
-        //     $response = new \Hill\Response(null);
-        //     $response->status($e->getCode());
-        //     return $response;
-        // });
+        $response = $requestHandler->handle($request);
 
-        // $response = $requestHandler->handle($request);
+        $this->assertNotNull($response, "Response is null");
+
         // if ($response !== null) {
-        //     $response->send();
+        
+        // Creates output buffer
+        ob_start();
+
+        $response->send();
+
+        $content = ob_end_clean(); // closing and put to $content
+
+        $this->assertEquals($response->status(), 200, sprintf("Response code: %d\n", $response->status()));
+        $this->assertEquals($content, "hello", "Response send something wrong");
         // }
-
-        // echo $response->status() . "\n";
-    }
-
-    public function testValidator()
-    {
-        // $validator = new Validator([
-        //     'name' => [
-        //         //// string required
-        //         function ($field, $value) {
-        //             return is_string($value)
-        //                 ? null
-        //                 : sprintf("Значение %s не является строковым значением", $field);
-        //         },
-        //         //// isnt empty
-        //         function ($field, $value) {
-        //             return is_string($value) && mb_strlen($value) < 1
-        //                 ? sprintf("Значение %s не указано", $field)
-        //                 : null;
-        //         },
-        //     ],
-        // ]);
-
-        // $errors = $validator->validate([
-        //     'name' => "",
-        // ]);
-
-        // $this->assertTrue(count($errors) == 0, "Ошибка валидации");
-    }
-
-    public function testRoute()
-    {
-        // $req = new Request("GET", "/333KZO");
-
-        // $route = new Route(new Module(TestModule::class), "GET", "/@username:[0-9a-z_]+", null);
-        // $route->compile();
-
-        // $matcher = new RouteMatcher([
-        //     $route
-        // ]);
-
-        // var_dump($matcher->match($req));
-    }
-
-    public function testDB()
-    {
-        $connection = new Connection(
-            new \PDO("mysql:host=localhost;dbname=test", "root", "123")
-        );
-
-        $databSource = new DataSource($connection);
-
-        $result = $databSource
-            ->createQueryBuilder("users")
-            ->setFindOptions([
-                'where' => [
-                    [
-                        'id' => 1,
-                        'username'  => 'admin',
-                    ],
-                    [
-                        'id' => 2,
-                    ]
-                ],
-            ])
-            ->getOne();
-
-        if ($result !== null) {
-            echo sprintf("Hello, %s!", $result['username']);
-        }
     }
 }

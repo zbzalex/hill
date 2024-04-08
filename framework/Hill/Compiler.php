@@ -19,17 +19,19 @@ class Compiler
     /**
      * Constructor
      * 
-     * @param string|array $moduleConfigOrClass
+     * @param array|string $moduleConfigOrClass Module config or module class
      */
     public function __construct($moduleConfigOrClass)
     {
         $this->moduleConfigOrClass = $moduleConfigOrClass;
         $this->container = new Container();
         $this->dependencyScanner = new DependencyScanner($this->container);
-        $this->instanceResolver = new InstanceResolver(new Injector(new Registry()));
+        $this->instanceResolver = new InstanceResolver();
     }
 
     /**
+     * Compile container modules and they dependencies
+     * 
      * @return Container
      */
     public function compile()
@@ -37,13 +39,9 @@ class Compiler
         // scan module for dependencies
         $this->dependencyScanner->scan($this->moduleConfigOrClass);
         
-        $modules = array_merge(
-            $this->container->getModules(),
-            $this->container->getGlobalModules()
-        );
-        
+        $modules = array_merge($this->container->getModules(), $this->container->getGlobalModules());
         foreach ($modules as $module) {
-            $this->instanceResolver->resolveInstances($module);
+            $this->instanceResolver->resolveModuleInstances($module);
         }
 
         return $this->container;

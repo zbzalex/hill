@@ -3,7 +3,7 @@
 namespace Hill;
 
 /**
- * Simple view class
+ * View class
  */
 class View implements \ArrayAccess
 {
@@ -13,6 +13,11 @@ class View implements \ArrayAccess
     private $template;
     private $helpers = [];
 
+    /**
+     * Contructor
+     * 
+     * @param string $path Base path
+     */
     public function __construct($path = '.')
     {
         $this->path = $path;
@@ -117,7 +122,7 @@ class View implements \ArrayAccess
         return htmlentities($str, ENT_QUOTES);
     }
 
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return isset($this->helpers[$key]);
     }
@@ -129,13 +134,12 @@ class View implements \ArrayAccess
             : null;
     }
 
-    public function offsetSet($key, $val)
+    public function offsetSet($key, $val): void
     {
         // 
     }
 
-
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         // 
     }

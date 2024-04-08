@@ -7,13 +7,26 @@ namespace Hill;
  */
 class RouteMatcher
 {
+    /**
+     * @var Route[] List of routes
+     */
     private $routes;
+
+    /**
+     * Constructor
+     * 
+     * @param Route[] $routes List of routes
+     */
     public function __construct(array $routes)
     {
         $this->routes = $routes;
     }
 
     /**
+     * Match route
+     * 
+     * @param Request $request
+     * 
      * @return Route|null
      */
     public function match(Request $request)

@@ -8,14 +8,14 @@ namespace Hill;
 class DependencyScanner
 {
     /**
-     * @var Container $container
+     * @var Container $container Container
      */
     private $container;
 
     /**
      * Constructor
      * 
-     * @param Container $container
+     * @param Container $container Container
      */
     public function __construct(Container $container)
     {
@@ -25,49 +25,193 @@ class DependencyScanner
     /**
      * Scan modules
      * 
-     * @param array $rootModuleConfigOrClass
+     * @param array|string $moduleConfigOrClass Module config or module class
      */
-    public function scan($rootModuleConfigOrClass)
+    public function scan($moduleConfigOrClass)
     {
-        $this->scanModule($rootModuleConfigOrClass);
+        $this->scanModule($moduleConfigOrClass);
+
         $this->resolveModules();
     }
 
     /**
+     * Resolve module config
      * 
+     * @param array|string $moduleConfigOrClass Module config or module class
+     * 
+     * @return array|null
      */
-    private function resolveModules()
+    public function resolveModuleConfig($moduleConfigOrClass)
     {
-        $modules  = array_merge(
-            $this->container->getGlobalModules(),
-            $this->container->getModules()
+        if (is_array($moduleConfigOrClass)) {
+            return $moduleConfigOrClass;
+        } else if (is_string($moduleConfigOrClass)) {
+            return self::createModuleForClass($moduleConfigOrClass);
+        }
+
+        return null;
+    }
+
+    /**
+     * Scan module
+     * 
+     * @param array|string $moduleConfigOrClass Module config or module class
+     * 
+     * @return Module
+     */
+    private function scanModule($moduleConfigOrClass)
+    {
+        // Resolve module config
+        $moduleConfig = $this->resolveModuleConfig($moduleConfigOrClass);
+        $moduleClass = $moduleConfig !== null && isset($moduleConfig['moduleClass'])
+            ? $moduleConfig['moduleClass']
+            : null;
+
+        if ($moduleConfig === null)
+            throw new \Exception(
+                "Module config is not defined"
+            );
+        if ($moduleClass === null)
+            throw new \Exception(sprintf(
+                "Undefined 'moduleClass' property"
+            ));
+
+        // Check is module registered
+        if (($module = $this->container->getModule($moduleClass)) !== null) {
+            return $module;
+        }
+
+        // Detect module scope
+        $isGlobal = isset($moduleConfig['global'])
+            && $moduleConfig['global'] === true;
+
+        // Create a new module
+        $module = new Module($moduleClass, $moduleConfig);
+        // and register him
+        $this->container->registerModule(
+            $module,
+            $isGlobal
+                ? Container::MODULE_SCOPE_GLOBAL
+                : Container::MODULE_SCOPE_NULL
         );
 
-        foreach ($modules as $module) {
-            $this->resolveModuleImports($module);
+        $providers = isset($moduleConfig['providers'])
+            && is_array($moduleConfig['providers'])
+            ? $moduleConfig['providers']
+            : [];
+
+        $controllers = isset($moduleConfig['controllers'])
+            && is_array($moduleConfig['controllers'])
+            ? $moduleConfig['controllers']
+            : [];
+
+        $importModules = isset($moduleConfig['importModules'])
+            && is_array($moduleConfig['importModules'])
+            ? $moduleConfig['importModules']
+            : [];
+
+        $this->scanModuleForProviders($module, $providers);
+        $this->scanModuleForControllers($module, $controllers);
+        $this->scanModuleForImports($module, $importModules);
+
+        return $module;
+    }
+
+    /**
+     * Scan module for providers
+     * 
+     * @param Module $module    Module
+     * @param array $providers  Module providers
+     */
+    private function scanModuleForProviders(Module $module, array $providers)
+    {
+        foreach ($providers as $providerConfigOrClass) {
+
+            /** @var array|null $factory Provider factory */
+            $factory = null;
+
+            if (is_array($providerConfigOrClass)) {
+                $providerClass = isset($providerConfigOrClass['providerClass'])
+                    ? $providerConfigOrClass['providerClass']
+                    : null;
+                if ($providerClass === null)
+                    continue;
+
+                if (!isset($providerConfigOrClass['factory']))
+                    continue;
+
+                $factory = $providerConfigOrClass['factory'];
+            } else {
+                if ($providerConfigOrClass === null)
+                    continue;
+
+                $providerClass = $providerConfigOrClass;
+
+                // Provider class must implements IInjectable interface
+                if (!Reflector::implementsInterface($providerClass, IInjectable::class))
+                    continue;
+            }
+
+            $module->addProvider($providerClass, $factory);
         }
     }
 
     /**
+     * Scan module for controllers
      * 
+     * @param Module $module        Module
+     * @param array $controllers    Module controllers
      */
-    private function resolveModuleImports(Module $module)
+    private function scanModuleForControllers(Module $module, array $controllers)
     {
-        $importModules = array_merge(
-            $this->container->getGlobalModules(),
-            $module->getImports()
-        );
+        foreach ($controllers as $controllerClass) {
+            if ($controllerClass === null)
+                continue;
 
-        foreach ($importModules as $importModule) {
-            $importModuleConfig = $importModule->getConfig();
-            $exportProviders = isset($importModuleConfig['exportProviders'])
-                && is_array($importModuleConfig['exportProviders'])
-                ? $importModuleConfig['exportProviders']
-                : [];
+            // Controller must implements IController interface
+            if (!Reflector::implementsInterface($controllerClass, IController::class))
+                continue;
+            
+            $module->addController($controllerClass);
+        }
+    }
 
-            foreach ($exportProviders as $exportProviderClass) {
-                $this->resolveProviderDeps($module, $importModule, $exportProviderClass);
+    /**
+     * Scan module for import modules
+     * 
+     * @param Module    $module         Module
+     * @param Module[]  $importModules  Module imports
+     */
+    private function scanModuleForImports(Module $module, array $importModules)
+    {
+        foreach ($importModules as $importModuleConfigOrClass) {
+            $importModuleConfig = [];
+            $importModule = null;
+            if (is_array($importModuleConfigOrClass)) {
+                $importModuleConfig = $importModuleConfigOrClass;
+            } else if (is_string($importModuleConfigOrClass)) {
+                // Fixed: bug with null module class
+                if ($importModuleConfigOrClass === null)
+                    continue;
+
+                $importModule = $this->container->getModule($importModuleConfigOrClass);
+                if ($importModule === null) {
+                    $importModuleConfig = self::createModuleForClass($importModuleConfigOrClass);
+                }
+            } else { // else invalid type
+                continue;
             }
+
+            // Scan module is not registered
+            if ($importModule === null) {
+                $importModule = $this->scanModule($importModuleConfig);
+            }
+
+            // Ignore global module
+            if ($importModule->isGlobal())
+                continue;
+
+            $module->addImport($importModule);
         }
     }
 
@@ -76,189 +220,45 @@ class DependencyScanner
      * 
      * @param string $moduleClass
      * 
-     * @throws \ReflectionException
-     * 
      * @return array
      */
     private static function createModuleForClass($moduleClass)
     {
         $reflectionClass = new \ReflectionClass($moduleClass);
         if (!$reflectionClass->implementsInterface(\Hill\IModule::class)) {
-            throw new \ReflectionException(
-                sprintf("Module '%s' must be implements of \Hill\IModule", $moduleClass)
+            throw new \Exception(
+                sprintf("Class '%s' is not implements \Hill\IModule", $moduleClass)
             );
         }
 
-        $createMethod = $reflectionClass->getMethod('create');
-        if (!$createMethod->isStatic() || !$createMethod->isPublic()) {
-            throw new \ReflectionException(
-                "Module method 'create' must be public static!"
-            );
-        }
-
-        $moduleConfig = $createMethod->invoke(null);
+        $moduleConfig = $reflectionClass->getMethod('create')->invoke(null);
 
         return $moduleConfig;
     }
 
     /**
-     * Scan modules
-     * 
-     * @param string|array $moduleConfigOrClass
-     * 
-     * @throws \Exception
-     * @throws \ReflectionException
-     * 
-     * @return Module
+     * Resolve modules
      */
-    private function scanModule(
-        $moduleConfigOrClass
-    ) {
-        $moduleConfig = [];
-
-        // resolve module
-        if (is_array($moduleConfigOrClass)) {
-            $moduleConfig = $moduleConfigOrClass;
-            $moduleClass = isset($moduleConfig['moduleClass'])
-                ? $moduleConfig['moduleClass']
-                : null;
-
-            if ($moduleClass === null)
-                throw new \Exception(
-                    "Module class property isnt specified!"
-                );
-        } else {
-            $moduleClass = $moduleConfigOrClass;
-            if (($moduleConfig = self::createModuleForClass($moduleClass)) === null)
-                throw new \Exception(
-                    sprintf("Failed to create module '%s'", $moduleClass)
-                );
-        }
-
-        // check if module already emplaced and return it if found
-        if (($module = $this->container->getModule($moduleClass)) !== null) {
-            return $module;
-        }
-
-        $isGlobal = isset($moduleConfig['global'])
-            && $moduleConfig['global'] === true;
-
-        // detect module scope and emplace into module container
-        if ($isGlobal) {
-            $this->container->addGlobalModule(
-                $moduleClass,
-                $moduleConfig
-            );
-        } else {
-            $this->container->addModule(
-                $moduleClass,
-                $moduleConfig
-            );
-        }
-
-        $module = $this->container->getModule($moduleClass);
-
-        try {
-            $providers = isset($moduleConfig['providers'])
-                && is_array($moduleConfig['providers'])
-                ? $moduleConfig['providers']
-                : [];
-
-            $controllers = isset($moduleConfig['controllers'])
-                && is_array($moduleConfig['controllers'])
-                ? $moduleConfig['controllers']
-                : [];
-
-            //// providers
-            foreach ($providers as $providerConfigOrClass) {
-                try {
-                    $factory = null;
-
-                    if (is_array($providerConfigOrClass)) {
-                        $providerClass = isset($providerConfigOrClass['providerClass'])
-                            ? $providerConfigOrClass['providerClass']
-                            : null;
-                        if ($providerClass === null)
-                            continue;
-
-                        if (!isset($providerConfigOrClass['factory']))
-                            continue;
-
-                        $factory = $providerConfigOrClass['factory'];
-                    } else {
-                        if ($providerConfigOrClass === null)
-                            continue;
-
-                        $providerClass = $providerConfigOrClass;
-                        $reflectionClass = new \ReflectionClass($providerClass);
-                        if (!$reflectionClass->implementsInterface(IInjectable::class))
-                            continue;
-                    }
-
-                    $module->addProvider($providerClass, $factory);
-                } catch (\ReflectionException $e) {
-                }
-            }
-
-            //// controllers
-            foreach ($controllers as $controllerClass) {
-                if ($controllerClass === null)
-                    continue;
-
-                try {
-                    if (!Reflector::implementsInterface($controllerClass, IController::class)) continue;
-
-                    $module->addController($controllerClass);
-                } catch (\ReflectionException $e) {
-                }
-            }
-
-            // must be optional property!
-            $importModules = isset($moduleConfig['importModules'])
-                && is_array($moduleConfig['importModules'])
-                ? $moduleConfig['importModules']
-                : [];
-
-            $this->scanModuleForImports($module, $importModules);
-        } catch (\ReflectionException $e) {
-        }
-
-        return $module;
-    }
-
-    /**
-     * Scan source module for import modules
-     * 
-     * @param Module    $module         Source module
-     * @param Module[]  $importModules  Source module imports
-     */
-    private function scanModuleForImports(Module $module, array $importModules = [])
+    private function resolveModules()
     {
-        foreach ($importModules as $importModuleConfigOrClass) {
-            $importModuleConfig = [];
+        // Select all modules with globals for resolve exports
+        $modules  = array_merge($this->container->getModules(), $this->container->getGlobalModules());
+        foreach ($modules as $module) {
+            // Current module imports with global modules
+            $currentModuleImports = array_merge($this->container->getGlobalModules(), $module->getImports());
 
-            $mod = null;
+            foreach ($currentModuleImports as $importModule) {
+                $importModuleConfig = $importModule->getConfig();
 
-            if (is_array($importModuleConfigOrClass)) {
-                $importModuleConfig = $importModuleConfigOrClass;
-            } else {
+                $exportProviders = isset($importModuleConfig['exportProviders'])
+                    && is_array($importModuleConfig['exportProviders'])
+                    ? $importModuleConfig['exportProviders']
+                    : [];
 
-                // fix bug with null module class
-                if ($importModuleConfigOrClass === null)
-                    continue;
-
-                $mod = $this->container->getModule($importModuleConfigOrClass);
-                if ($mod === null) {
-                    $importModuleConfig = self::createModuleForClass($importModuleConfigOrClass);
+                // Resolve import module export services
+                foreach ($exportProviders as $exportProviderClass) {
+                    $this->resolveProvider($module, $importModule, $exportProviderClass);
                 }
-            }
-
-            if ($mod === null) {
-                $mod = $this->scanModule($importModuleConfig);
-            }
-
-            if (!$mod->isGlobal()) {
-                $module->addImport($mod);
             }
         }
     }
@@ -266,32 +266,37 @@ class DependencyScanner
     /**
      * Resolve provider dependencies for module
      * 
-     * @param Module $module            src module
-     * @param Module $importModule      dst module
-     * @param string $providerClass     provider class
+     * @param Module $importer          Importer
+     * @param Module $exporter          Exporter
+     * @param string $providerClass     Provider class
      */
-    private function resolveProviderDeps(
-        Module $src,
-        Module $dst,
+    private function resolveProvider(
+        Module $importer,
+        Module $exporter,
         string $providerClass
     ) {
-        $providers = $dst->getProviders();
-        if (isset($providers[$providerClass])) {
+        $providers = $exporter->getProviders();
+        if (isset($providers[$providerClass]))
+            throw new \Exception(sprintf(
+                "Provider '%s' not specified in module '%s'",
+                $providerClass,
+                $exporter->getModuleClass(),
+            ));
 
-            $provider = $providers[$providerClass];
+        $provider = $providers[$providerClass];
 
-            // check if provider isnt factory and resolve deps for export
-            if ($provider->factory === null) {
-                try {
-                    $deps = Reflector::getConstructorArgs($providerClass);
-                    foreach ($deps as $depProviderClass) {
-                        $this->resolveProviderDeps($src, $dst, $depProviderClass);
-                    }
-                } catch (\ReflectionException $e) {
+        if ($provider->factory === null) {
+
+            // Scan provider dependencies
+            try {
+                $deps = Reflector::getConstructorArgs($providerClass);
+                foreach ($deps as $depProviderClass) {
+                    $this->resolveProvider($importer, $exporter, $depProviderClass);
                 }
+            } catch (\ReflectionException $e) {
             }
-
-            $src->addProvider($providerClass, $provider->factory);
         }
+        
+        $importer->addProvider($providerClass, $provider->factory);
     }
 }

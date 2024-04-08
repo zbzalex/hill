@@ -15,24 +15,22 @@ class InstanceResolver
      * 
      * @param Injector $injector
      */
-    public function __construct(Injector $injector)
+    public function __construct(Injector $injector = null)
     {
-        $this->injector = $injector;
+        $this->injector = $injector !== null
+            ? $injector
+            : new Injector();
     }
 
     /**
-     * Resolve instances
+     * Resolve module instances
      * 
-     * @param Module $module
+     * @param Module $module The module
      */
-    public function resolveInstances(Module $module)
+    public function resolveModuleInstances(Module $module)
     {
-        $unresolvedInstanceWrappers = array_merge(
-            $module->getProviders(),
-            $module->getControllers()
-        );
-
-        foreach ($unresolvedInstanceWrappers as $instanceWrapper) {
+        $instanceWrappers = array_merge($module->getProviders(), $module->getControllers());
+        foreach ($instanceWrappers as $instanceWrapper) {
             $this->injector->resolveInstance($module, $instanceWrapper);
         }
     }

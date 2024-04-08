@@ -18,6 +18,8 @@ class RequestHandler
     private $errorHandler;
 
     /**
+     * Constructor
+     * 
      * @param Route[]   $routes
      * @param callable  $errorHandler
      */
@@ -28,6 +30,8 @@ class RequestHandler
     }
 
     /**
+     * Handle request
+     * 
      * @param Request $request
      * 
      * @return Response|null
@@ -56,7 +60,7 @@ class RequestHandler
                 $response = $reflectionClass->getMethod($controller[1])->invokeArgs($controller[0], [
                     $request
                 ]);
-                
+
                 if (is_array($response)) {
                     $response = new JsonResponse($response);
                 } else if (is_scalar($response)) {

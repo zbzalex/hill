@@ -7,6 +7,9 @@ namespace Hill;
  */
 class Route
 {
+    /**
+     * @var Module $module
+     */
     private $module;
 
     /**
@@ -20,33 +23,40 @@ class Route
     private $path;
 
     /**
-     * 
+     * @var array
      */
     private $controller;
 
     /**
-     * 
+     * @var string
      */
     private $compiledPath;
 
     /**
-     * 
+     * @var array $args
      */
     private $args;
 
 
     /**
-     * 
+     * @var Middleware[] $middlewares
      */
     private $middlewares;
 
     /**
-     * 
+     * @var Interceptor[] $incerceptors
      */
     private $interceptors;
 
     /**
+     * Contructor
      * 
+     * @param Module $module
+     * @param string $requestMethod
+     * @param string $path
+     * @param array $controller
+     * @param Middleware[] $middlewares
+     * @param Interceptor[] $interceptors
      */
     public function __construct(
         Module $module,
@@ -101,31 +111,42 @@ class Route
         ;
     }
 
-    public function getModule()
+    /**
+     * Returns module
+     * 
+     * @return Module
+     */
+    public function getModule(): Module
     {
         return $this->module;
     }
 
     /**
+     * Returns request method
      * 
+     * @return string
      */
-    public function getRequestMethod()
+    public function getRequestMethod(): string
     {
         return $this->requestMethod;
     }
 
     /**
+     * Returns route path
      * 
+     * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
+     * Returns route controller
      * 
+     * @return array
      */
-    public function getController()
+    public function getController(): array 
     {
         return $this->controller;
     }
@@ -135,24 +156,36 @@ class Route
      * 
      * @return string
      */
-    public function getCompiledPath()
+    public function getCompiledPath(): string
     {
         return $this->compiledPath;
     }
 
     /**
+     * Returns request args
      * 
+     * @return array
      */
-    public function getArgs()
+    public function getArgs(): array
     {
         return $this->args;
     }
 
+    /**
+     * Returns route middlewares
+     * 
+     * @return Middleware[]
+     */
     public function getMiddlewares()
     {
         return $this->middlewares;
     }
 
+    /**
+     * Returns route interceptors
+     * 
+     * @return Interceptor[]
+     */
     public function getInterceptors()
     {
         return $this->interceptors;

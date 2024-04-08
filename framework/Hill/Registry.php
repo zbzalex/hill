@@ -3,7 +3,7 @@
 namespace Hill;
 
 /**
- * Registry
+ * Registry class
  */
 class Registry
 {

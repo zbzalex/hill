@@ -33,11 +33,11 @@ class WebApplication implements IApplication
     private $errorHandler;
 
     /**
+     * Constructor
+     * 
      * @param Container $container
      */
-    public function __construct(
-        Container $container
-    ) {
+    public function __construct(Container $container) {
         $this->container = $container;
         $this->routeScanner = new RouteScanner($container);
         $this->routes = [];
@@ -51,6 +51,8 @@ class WebApplication implements IApplication
     }
 
     /**
+     * Sets base path
+     * 
      * @param string $path
      */
     public function setBasePath($path)
@@ -59,65 +61,66 @@ class WebApplication implements IApplication
     }
 
     /**
-     * @param callable $handler
+     * Sets error handler
+     * 
+     * @param callable $handler The callback
      */
     public function setErrorHandler($handler)
     {
         $this->errorHandler = $handler;
     }
 
+    public function scanRoutes()
+    {
+        $this->routes = $this->routeScanner->scan($this->basePath);
+    }
+
     /**
-     * 
+     * Init routes for modules
      */
     public function init()
     {
-        $this->routes = $this->routeScanner->scan($this->basePath);
-        
-        $modules = array_merge(
-            $this->container->getModules(),
-            $this->container->getGlobalModules()
-        );
+        $this->scanRoutes();
 
+        $modules = array_merge($this->container->getModules(), $this->container->getGlobalModules());
         foreach ($modules as $module) {
-            if (
-                !Reflector::implementsInterface(
-                    $module->getModuleClass(),
-                    IOnModuleInit::class
-                )
-            ) continue;
 
+            if (!Reflector::implementsInterface($module->getModuleClass(), IOnModuleInit::class))
+                continue;
+            
             Reflector::invokeArgs($module->getModuleClass(), "onInit", null, [
                 $module
             ]);
+
         }
     }
 
     /**
-     * 
+     * Run the application
      */
     public function run()
     {
-        $this->handleRequest();
+        $response = $this->handleRequest();
+        if ($response !== null) {
+            $response->send();
+        }
     }
 
     /**
-     * @param Request $request
+     * Handle request
+     * 
+     * @param Request $request Http request
      * 
      * @return Response|null
      */
     public function handleRequest(Request $request = null)
     {
-        // Если запрос не был передан как 1 агрумент, то создём его из глобыльных
-        // переменных.
         $request = $request === null
             ? Request::createFromGlobals()
             : $request;
 
         $requestHandler = new RequestHandler($this->routes, $this->errorHandler);
 
-        $response = $requestHandler->handle($request);
-        if ($response !== null) {
-            $response->send();
-        }
+        return $requestHandler->handle($request);
     }
 }

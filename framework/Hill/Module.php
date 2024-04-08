@@ -9,17 +9,46 @@ use ArrayObject;
  */
 class Module extends ArrayObject
 {
-    private string $moduleClass;
+    /**
+     * @var string $moduleClass Module class
+     */
+    private $moduleClass;
+
+    /**
+     * @var
+     */
     private $imports;
+
+    /**
+     * @var
+     */
     private $controllers;
+
+    /**
+     * @var
+     */
     private $providers;
-    private array $config;
+
+    /**
+     * @var
+     */
+    private $config;
+
+    /**
+     * @var
+     */
     private $middlewares;
+
+    /**
+     * @var
+     */
     private $interceptors;
 
     /**
-     * @param string $moduleClass   Module class
-     * @param array  $config        Module config
+     * Contructor
+     * 
+     * @param string $moduleClass   The module class
+     * @param array  $config        The module config
      */
     public function __construct($moduleClass, array $config = [])
     {
@@ -33,6 +62,8 @@ class Module extends ArrayObject
     }
 
     /**
+     * Returns module class
+     * 
      * @return string
      */
     public function getModuleClass()
@@ -41,6 +72,8 @@ class Module extends ArrayObject
     }
 
     /**
+     * Returns module config
+     * 
      * @return array
      */
     public function getConfig()
@@ -49,6 +82,8 @@ class Module extends ArrayObject
     }
 
     /**
+     * Returns module imports
+     * 
      * @return Module[]
      */
     public function getImports()
@@ -57,6 +92,8 @@ class Module extends ArrayObject
     }
 
     /**
+     * Returns module controllers
+     * 
      * @return InstanceWrapper[]
      */
     public function getControllers()
@@ -65,15 +102,17 @@ class Module extends ArrayObject
     }
 
     /**
+     * Returns module providers
+     * 
      * @return InstanceWrapper[]
      */
     public function getProviders()
     {
         return $this->providers;
     }
-
+    
     /**
-     * 
+     * @return InstanceWrappers[]
      */
     public function getMiddlewares()
     {
@@ -162,12 +201,12 @@ class Module extends ArrayObject
     }
 
     /**
-     * Check if module is global
+     * Check is module global
      * 
      * @return bool
      */
     public function isGlobal()
     {
-        return isset($this->config['global']) && $this->config['global'];
+        return isset($this->config['global']) && $this->config['global'] === true;
     }
 }

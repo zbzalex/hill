@@ -13,6 +13,9 @@ class Container
     /** @var Module[] $globalModules */
     private $globalModules;
 
+    const MODULE_SCOPE_NULL     = 0x00;
+    const MODULE_SCOPE_GLOBAL   = 0x01;
+
     /**
      * Constructor
      */
@@ -23,30 +26,22 @@ class Container
     }
 
     /**
-     * @param string $moduleClass
-     * @param array $config
+     * Register module
      * 
-     * @return Module|null
+     * @param Module $module The module
      */
-    public function addModule($moduleClass, array $config = [])
+    public function registerModule(Module $module, $scope = self::MODULE_SCOPE_NULL)
     {
-        $module = new Module($moduleClass, $config);
-
-        $this->modules[$moduleClass] = $module;
-
-        return $module;
-    }
-
-    public function addGlobalModule($moduleClass, array $config = [])
-    {
-        $module = new Module($moduleClass, $config);
-
-        $this->globalModules[$moduleClass] = $module;
-
-        return $module;
+        if ($scope === static::MODULE_SCOPE_GLOBAL) {
+            $this->globalModules[$module->getModuleClass()] = $module;
+        } else {
+            $this->modules[$module->getModuleClass()] = $module;
+        }
     }
 
     /**
+     * Returns registered modules
+     * 
      * @return Module[]
      */
     public function getModules()
@@ -55,6 +50,8 @@ class Container
     }
 
     /**
+     * Returns global modules
+     * 
      * @return Module[]
      */
     public function getGlobalModules()
@@ -63,7 +60,9 @@ class Container
     }
 
     /**
-     * @param string $moduleClass
+     * Returns module by module class
+     * 
+     * @param string $moduleClass Module class
      * 
      * @return Module
      */
@@ -74,5 +73,17 @@ class Container
             : (isset($this->globalModules[$moduleClass])
                 ? $this->globalModules[$moduleClass]
                 : null);
+    }
+
+    /**
+     * Checks is module was registered
+     * 
+     * @param string $moduelClass Module class
+     * 
+     * @return bool
+     */
+    public function isModuleRegistered($moduleClass)
+    {
+        return isset($this->modules[$moduleClass]) || isset($this->globalModules[$moduleClass]);
     }
 }

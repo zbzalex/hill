@@ -16,9 +16,11 @@ class RouteScanner
      * @var Route[] $routes
      */
     private $routes;
-
+    
     /**
+     * Constructor
      * 
+     * @param Container $container Module container
      */
     public function __construct(Container $container)
     {
@@ -27,11 +29,14 @@ class RouteScanner
     }
 
     /**
+     * Scanning routes
      * 
+     * @param string $basePath Base path
+     * 
+     * @return Route[]
      */
     public function scan($basePath)
     {
-        // базовый путь приложения всегда должен содержать слэш в конце
         $basePath = rtrim($basePath, '/') . "/";
 
         $modules = array_merge(
@@ -80,6 +85,8 @@ class RouteScanner
     }
 
     /**
+     * Register routes
+     * 
      * @param InstanceResolver $instanceResolver
      */
     private function registerRoutes(

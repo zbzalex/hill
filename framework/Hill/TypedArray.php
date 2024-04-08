@@ -2,10 +2,18 @@
 
 namespace Hill;
 
+/**
+ * Typed array utility
+ */
 class TypedArray
 {
     private array $array;
 
+    /**
+     * Constructor
+     * 
+     * @param array $array Input array
+     */
     public function __construct(array $array)
     {
         $this->array = $array;

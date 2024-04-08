@@ -23,6 +23,8 @@ class InstanceWrapper
     public $factory;
 
     /**
+     * Constructor
+     * 
      * @param string     $instanceClass Instance class
      * @param array|null $factory       Factory
      */

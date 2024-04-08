@@ -3,14 +3,16 @@
 namespace Hill;
 
 /**
- * Module class
+ * Module interface
  */
 interface IModule
 {
     /**
-     * @param array $options
+     * Creates module config by options
+     * 
+     * @param array $options Module options
      * 
      * @return array
      */
-    public static function create(array $options = []);
+    public static function create(array $options = []): array;
 }
