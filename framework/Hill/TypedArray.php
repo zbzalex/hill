@@ -1,6 +1,6 @@
 <?php
 
-namespace Hill\Utils;
+namespace Hill;
 
 /**
  * Typed array
