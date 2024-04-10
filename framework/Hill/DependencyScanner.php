@@ -287,9 +287,9 @@ class DependencyScanner
         string $providerClass
     ) {
         $providers = $exporter->getProviders();
-        if (isset($providers[$providerClass]))
+        if (!isset($providers[$providerClass]))
             throw new \Exception(sprintf(
-                "Provider '%s' not specified in module '%s'",
+                "Provider '%s' not found in module '%s'",
                 $providerClass,
                 $exporter->getModuleClass(),
             ));
