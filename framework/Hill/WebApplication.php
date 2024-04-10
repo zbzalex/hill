@@ -37,7 +37,8 @@ class WebApplication implements IApplication
      * 
      * @param Container $container
      */
-    public function __construct(Container $container) {
+    public function __construct(Container $container)
+    {
         $this->container = $container;
         $this->routeScanner = new RouteScanner($container);
         $this->routes = [];
@@ -76,22 +77,28 @@ class WebApplication implements IApplication
     }
 
     /**
-     * Init routes for modules
+     * Initialization
      */
     public function init()
     {
         $this->scanRoutes();
+        $this->processInitializeModules();
+    }
 
+    /**
+     * Process initialization modules
+     */
+    public function processInitializeModules()
+    {
         $modules = array_merge($this->container->getModules(), $this->container->getGlobalModules());
         foreach ($modules as $module) {
 
             if (!Reflector::implementsInterface($module->getModuleClass(), IOnModuleInit::class))
                 continue;
-            
+
             Reflector::invokeArgs($module->getModuleClass(), "onInit", null, [
                 $module
             ]);
-
         }
     }
 

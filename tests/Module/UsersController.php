@@ -16,7 +16,7 @@ class UsersController extends \Hill\Controller implements \Hill\IController
             ],
         ];
     }
-
+    
     public function _index(Request $req)
     {
         return "hello";

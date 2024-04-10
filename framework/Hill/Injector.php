@@ -32,7 +32,7 @@ class Injector
      * 
      * @return object|null
      */
-    public function resolveInstance(Module $module, InstanceWrapper $wrapper)
+    public function instantiate(Module $module, InstanceWrapper $wrapper)
     {
         // If instance already resolved
         if ($wrapper->instance !== null) {
@@ -92,7 +92,7 @@ class Injector
                 } else {
 
                     // Argument list for class instantiation
-                    $args = [];
+                    $deps = [];
 
                     // Enumerate each of parameters
                     foreach ($constructorParams as $param) {
@@ -120,14 +120,14 @@ class Injector
                         $provider = $providers[$paramClass];
 
                         // Resolve this provider
-                        $instance = $this->resolveInstance($module, $provider);
+                        $instance = $this->instantiate($module, $provider);
 
                         // Add a instance into argument list
-                        $args[] = $instance;
+                        $deps[] = $instance;
                     }
 
                     // Instantiate a new object with arguments and set into wrapper
-                    $wrapper->instance = $reflectionClass->newInstanceArgs($args);
+                    $wrapper->instance = $reflectionClass->newInstanceArgs($deps);
                 }
             } else {
                 // Instantiate a new object without contructor

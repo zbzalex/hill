@@ -69,7 +69,7 @@ class Reflector
      * 
      * @param string $class             Class
      * @param string $methodName        Method name
-     * @param object|null $thisObject   This object
+     * @param object|null $thisObject   Context
      * @param array $args               Invoke args
      * 
      * @return mixed|null

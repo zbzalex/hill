@@ -3,7 +3,7 @@
 namespace Hill;
 
 /**
- * Validator class
+ * Base validator class
  */
 class Validator
 {

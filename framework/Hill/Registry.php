@@ -21,6 +21,8 @@ class Registry
     }
 
     /**
+     * Get instance
+     * 
      * @param string $instanceClass
      * 
      * @return object|null
@@ -33,6 +35,8 @@ class Registry
     }
 
     /**
+     * Set instance
+     * 
      * @param string $instanceClass
      * @param object $instance
      */

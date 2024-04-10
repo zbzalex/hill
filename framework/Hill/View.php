@@ -3,14 +3,33 @@
 namespace Hill;
 
 /**
- * View class
+ * Base view class
  */
 class View implements \ArrayAccess
 {
+    /**
+     * @var string $path Views path
+     */
     public $path;
+
+    /**
+     * @var string $extension View files extension
+     */
     public $extension = '.php';
+
+    /**
+     * @var array $vars Global variables
+     */
     private $vars = [];
+
+    /**
+     * @var string $template The template
+     */
     private $template;
+
+    /**
+     * @var IViewHelper[] $helpers View helpers
+     */
     private $helpers = [];
 
     /**

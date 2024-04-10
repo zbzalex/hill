@@ -27,11 +27,13 @@ class InstanceResolver
      * 
      * @param Module $module The module
      */
-    public function resolveModuleInstances(Module $module)
+    public function processModuleServicesInstantiation(Module $module)
     {
+        // Injectable instantances
         $instanceWrappers = array_merge($module->getProviders(), $module->getControllers());
+
         foreach ($instanceWrappers as $instanceWrapper) {
-            $this->injector->resolveInstance($module, $instanceWrapper);
+            $this->injector->instantiate($module, $instanceWrapper);
         }
     }
 }

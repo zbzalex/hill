@@ -41,7 +41,7 @@ class Compiler
         
         $modules = array_merge($this->container->getModules(), $this->container->getGlobalModules());
         foreach ($modules as $module) {
-            $this->instanceResolver->resolveModuleInstances($module);
+            $this->instanceResolver->processModuleServicesInstantiation($module);
         }
 
         return $this->container;

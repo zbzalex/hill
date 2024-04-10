@@ -23,15 +23,14 @@ class DependencyScanner
     }
 
     /**
-     * Scan modules
+     * Scan modules from root
      * 
      * @param array|string $moduleConfigOrClass Module config or module class
      */
     public function scan($moduleConfigOrClass)
     {
         $this->scanModule($moduleConfigOrClass);
-
-        $this->resolveModules();
+        $this->buildModules();
     }
 
     /**
@@ -171,7 +170,7 @@ class DependencyScanner
             // Controller must implements IController interface
             if (!Reflector::implementsInterface($controllerClass, IController::class))
                 continue;
-            
+
             $module->addController($controllerClass);
         }
     }
@@ -237,42 +236,54 @@ class DependencyScanner
     }
 
     /**
-     * Resolve modules
+     * Build modules
      */
-    private function resolveModules()
+    private function buildModules()
     {
         // Select all modules with globals for resolve exports
         $modules  = array_merge($this->container->getModules(), $this->container->getGlobalModules());
+        
         foreach ($modules as $module) {
             // Current module imports with global modules
-            $currentModuleImports = array_merge($this->container->getGlobalModules(), $module->getImports());
+            $imports = array_merge($this->container->getGlobalModules(), $module->getImports());
 
-            foreach ($currentModuleImports as $importModule) {
-                $importModuleConfig = $importModule->getConfig();
-
-                $exportProviders = isset($importModuleConfig['exportProviders'])
-                    && is_array($importModuleConfig['exportProviders'])
-                    ? $importModuleConfig['exportProviders']
-                    : [];
-
-                // Resolve import module export services
-                foreach ($exportProviders as $exportProviderClass) {
-                    $this->resolveProvider($module, $importModule, $exportProviderClass);
-                }
+            foreach ($imports as $importModule) {
+                $this->exportProviders($importModule, $module);
             }
         }
     }
 
     /**
-     * Resolve provider dependencies for module
+     * Export module export providers
      * 
-     * @param Module $importer          Importer
+     * @param Module $exporter Exporter
+     * @param Module $importer Importer
+     */
+    private function exportProviders(Module $exporter, Module $importer)
+    {
+        $importModuleConfig = $exporter->getConfig();
+
+        $exportProviders = isset($importModuleConfig['exportProviders'])
+            && is_array($importModuleConfig['exportProviders'])
+            ? $importModuleConfig['exportProviders']
+            : [];
+
+        // Resolve import module export services
+        foreach ($exportProviders as $exportProviderClass) {
+            $this->exportProviderWithDeps($exporter, $importer, $exportProviderClass);
+        }
+    }
+
+    /**
+     * Export provider with dependencies from export module to import module
+     * 
      * @param Module $exporter          Exporter
+     * @param Module $importer          Importer
      * @param string $providerClass     Provider class
      */
-    private function resolveProvider(
-        Module $importer,
+    private function exportProviderWithDeps(
         Module $exporter,
+        Module $importer,
         string $providerClass
     ) {
         $providers = $exporter->getProviders();
@@ -287,16 +298,16 @@ class DependencyScanner
 
         if ($provider->factory === null) {
 
-            // Scan provider dependencies
+            // Scan provider for dependencies
             try {
                 $deps = Reflector::getConstructorArgs($providerClass);
                 foreach ($deps as $depProviderClass) {
-                    $this->resolveProvider($importer, $exporter, $depProviderClass);
+                    $this->exportProviderWithDeps($importer, $exporter, $depProviderClass);
                 }
             } catch (\ReflectionException $e) {
             }
         }
-        
+
         $importer->addProvider($providerClass, $provider->factory);
     }
 }

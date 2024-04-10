@@ -15,40 +15,40 @@ class Module extends ArrayObject
     private $moduleClass;
 
     /**
-     * @var
+     * @var string[] $imports Import modules
      */
     private $imports;
 
     /**
-     * @var
+     * @var string[] $controllers Controllers
      */
     private $controllers;
 
     /**
-     * @var
+     * @var mixed[] $providers Providers
      */
     private $providers;
 
     /**
-     * @var
+     * @var array $config Module config
      */
     private $config;
 
     /**
-     * @var
+     * @var IMiddlewares[] $middlewares Module middlewares
      */
     private $middlewares;
 
     /**
-     * @var
+     * @var IInterceptors[] $interceptors Module interceptors
      */
     private $interceptors;
 
     /**
      * Contructor
      * 
-     * @param string $moduleClass   The module class
-     * @param array  $config        The module config
+     * @param string $moduleClass   Module class
+     * @param array  $config        Module config
      */
     public function __construct($moduleClass, array $config = [])
     {
@@ -82,7 +82,7 @@ class Module extends ArrayObject
     }
 
     /**
-     * Returns module imports
+     * Returns list of imports
      * 
      * @return Module[]
      */
@@ -92,7 +92,7 @@ class Module extends ArrayObject
     }
 
     /**
-     * Returns module controllers
+     * Returns list of controllers
      * 
      * @return InstanceWrapper[]
      */
@@ -102,7 +102,7 @@ class Module extends ArrayObject
     }
 
     /**
-     * Returns module providers
+     * Returns list of providers
      * 
      * @return InstanceWrapper[]
      */
@@ -112,6 +112,8 @@ class Module extends ArrayObject
     }
     
     /**
+     * Returns list of middlewares
+     * 
      * @return InstanceWrappers[]
      */
     public function getMiddlewares()
@@ -120,6 +122,8 @@ class Module extends ArrayObject
     }
 
     /**
+     * Returns list of interceptors
+     * 
      * @return InstanceWrappers[]
      */
     public function getInterceptors()
@@ -128,7 +132,9 @@ class Module extends ArrayObject
     }
 
     /**
-     * @param string $instanceClass
+     * Puts controller in module
+     * 
+     * @param string $instanceClass Controller class
      * 
      * @return InstanceWrapper
      */
@@ -141,8 +147,10 @@ class Module extends ArrayObject
     }
 
     /**
-     * @param string $instanceClass
-     * @param mixed $factory
+     * Puts provider in module
+     * 
+     * @param string $instanceClass Provider class
+     * @param null|array $factory   Provider factory
      * 
      * @return InstanceWrapper
      */
@@ -155,7 +163,9 @@ class Module extends ArrayObject
     }
 
     /**
-     * @param stirng $instanceClass
+     * Puts middleware in module
+     * 
+     * @param stirng $instanceClass Middlewar class
      * 
      * @return InstanceWrapper
      */
@@ -168,7 +178,9 @@ class Module extends ArrayObject
     }
 
     /**
-     * @param string $instanceClass
+     * Puts interceptor in module
+     * 
+     * @param string $instanceClass Interceptor class
      * 
      * @return InstanceWrapper
      */
@@ -181,7 +193,9 @@ class Module extends ArrayObject
     }
 
     /**
-     * @param Module $module
+     * Puts import in module
+     * 
+     * @param Module $module Module which will be imported
      */
     public function addImport(Module $module)
     {
@@ -189,7 +203,9 @@ class Module extends ArrayObject
     }
     
     /**
-     * @param string $providerClass
+     * Array access by key
+     * 
+     * @param string $providerClass Provider class
      * 
      * @return object|null
      */

@@ -1,9 +1,9 @@
 <?php
 
-namespace Hill;
+namespace Hill\Utils;
 
 /**
- * Typed array utility
+ * Typed array
  */
 class TypedArray
 {
@@ -53,7 +53,7 @@ class TypedArray
             ? $value
             : $default;
     }
-
+    
     public function getBool(string $key, $default = false)
     {
         $value = $this->get($key, $default);
@@ -61,6 +61,13 @@ class TypedArray
         return is_bool($value) ? $value : $default;
     }
 
+    /**
+     * Returns typed array
+     * 
+     * @param string $key Array key
+     * 
+     * @return TypedArray
+     */
     public function getArray(string $key)
     {
         $value = $this->get($key, null);
