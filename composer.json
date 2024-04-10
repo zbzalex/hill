@@ -1,5 +1,5 @@
 {
-    "name": "zbzalex/hill-php",
+    "name": "zbzalex/hill",
     "type": "library",
     "minimum-stability": "dev",
     "autoload": {
