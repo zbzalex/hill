@@ -90,7 +90,7 @@ class WebApplication implements IApplication
    */
   public function initializeModules()
   {
-    $modules = array_merge($this->container->getModules(), $this->container->getGlobalModules());
+    $modules = $this->container->getModules();
     foreach ($modules as $module) {
 
       if (!Reflector::implementsInterface($module->getModuleClass(), IOnModuleInit::class))
