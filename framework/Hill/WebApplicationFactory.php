@@ -17,8 +17,8 @@ class WebApplicationFactory implements IApplicationFactory
      */
     public static function create($moduleConfigOrClass, array $options = []): IApplication
     {
-        $compiler = new Compiler($moduleConfigOrClass);
-        $container = $compiler->compile();
+        $containerBuilder = new ContainerBuilder($moduleConfigOrClass);
+        $container = $containerBuilder->build();
 
         $app = new WebApplication($container);
 

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Hill\ContainerBuilder;
 use Hill\Module;
 use Hill\Request;
 use Hill\RequestMethod;
@@ -18,14 +19,14 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
     public function testModule()
     {
         /** @var \Hill\Container $container */
-        $container = \Hill\Test::createTestModule(\Module\UsersModule::class);
+        $container = \Hill\Test::createTestModule(\Module\TestModule::class);
 
         // scan routes
         $routeScanner = new RouteScanner($container);
         $routes = $routeScanner->scan("/");
 
         // create request
-        $request = new Request(RequestMethod::GET, "/users");
+        $request = new Request(RequestMethod::GET, "/hello");
 
         // handle request and send response
         $requestHandler = new \Hill\RequestHandler($routes, function (\Exception $e) {
@@ -53,5 +54,17 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($response->status(), 200, sprintf("Response code: %d\n", $response->status()));
         $this->assertEquals($content, "hello", "Response send something wrong");
         // }
+    }
+
+    public function _testContainerBuilder() {
+      
+      $containerBuilder = new ContainerBuilder(
+        \Module\TestModule::create(),
+      );
+
+      $container = $containerBuilder->build();
+
+
+
     }
 }

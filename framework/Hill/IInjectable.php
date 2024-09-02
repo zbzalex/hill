@@ -7,6 +7,4 @@ namespace Hill;
  * 
  * Serving as marker
  */
-interface IInjectable
-{
-}
+interface IInjectable {}

@@ -5,6 +5,4 @@ namespace Hill;
 /**
  * Http exception class
  */
-class HttpException extends \Exception
-{
-}
+class HttpException extends \Exception {}
