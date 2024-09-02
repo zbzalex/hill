@@ -7,33 +7,33 @@ namespace Hill;
  */
 class InstanceResolver
 {
-    /** @var Injector $injector */
-    private $injector;
+  /** @var Injector $injector */
+  private $injector;
 
-    /**
-     * Constructor
-     * 
-     * @param Injector $injector
-     */
-    public function __construct(Injector $injector = null)
-    {
-        $this->injector = $injector !== null
-            ? $injector
-            : new Injector();
+  /**
+   * Constructor
+   * 
+   * @param Injector $injector
+   */
+  public function __construct(Injector $injector = null)
+  {
+    $this->injector = $injector !== null
+      ? $injector
+      : new Injector();
+  }
+
+  /**
+   * Resolve module instances
+   * 
+   * @param Module $module The module
+   */
+  public function instantiateInjectables(Module $module)
+  {
+    // Injectable instantances
+    $instanceWrappers = array_merge($module->getProviders(), $module->getControllers());
+
+    foreach ($instanceWrappers as $instanceWrapper) {
+      $this->injector->instantiate($module, $instanceWrapper);
     }
-
-    /**
-     * Resolve module instances
-     * 
-     * @param Module $module The module
-     */
-    public function processModuleServicesInstantiation(Module $module)
-    {
-        // Injectable instantances
-        $instanceWrappers = array_merge($module->getProviders(), $module->getControllers());
-
-        foreach ($instanceWrappers as $instanceWrapper) {
-            $this->injector->instantiate($module, $instanceWrapper);
-        }
-    }
+  }
 }

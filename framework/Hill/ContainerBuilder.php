@@ -3,16 +3,16 @@
 namespace Hill;
 
 /**
- * Container compiler class
+ * Container builder class
  */
-class Compiler
+class ContainerBuilder
 {
     /** @var string|array $moduleConfigOrClass */
     private $moduleConfigOrClass;
     /** @var Container $container */
     private $container;
-    /** @var DependencyScanner $dependencyScanner */
-    private $dependencyScanner;
+    /** @var Scanner $scanner */
+    private $scanner;
     /** @var InstanceResolver $instanceResolver */
     private $instanceResolver;
 
@@ -25,23 +25,23 @@ class Compiler
     {
         $this->moduleConfigOrClass = $moduleConfigOrClass;
         $this->container = new Container();
-        $this->dependencyScanner = new DependencyScanner($this->container);
+        $this->scanner = new Scanner($this->container);
         $this->instanceResolver = new InstanceResolver();
     }
 
     /**
-     * Compile container modules and they dependencies
+     * Build container modules and they dependencies
      * 
      * @return Container
      */
-    public function compile()
+    public function build()
     {
         // scan module for dependencies
-        $this->dependencyScanner->scan($this->moduleConfigOrClass);
+        $this->scanner->scan($this->moduleConfigOrClass);
         
-        $modules = array_merge($this->container->getModules(), $this->container->getGlobalModules());
+        $modules = $this->container->getModules();
         foreach ($modules as $module) {
-            $this->instanceResolver->processModuleServicesInstantiation($module);
+            $this->instanceResolver->instantiateInjectables($module);
         }
 
         return $this->container;

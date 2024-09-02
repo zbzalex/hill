@@ -7,10 +7,10 @@ namespace Hill;
  */
 interface IViewHelper
 {
-    /**
-     * Returns the helper name
-     * 
-     * @return string
-     */
-    public function getName(): string;
+  /**
+   * Returns the helper name
+   * 
+   * @return string
+   */
+  public function getName(): string;
 }
