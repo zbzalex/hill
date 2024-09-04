@@ -5,7 +5,7 @@ namespace Hill;
 /**
  * Base view class
  */
-class View implements \ArrayAccess
+class View
 {
   /**
    * @var string $path Views path
@@ -141,18 +141,10 @@ class View implements \ArrayAccess
     return htmlentities($str, ENT_QUOTES);
   }
 
-  public function offsetExists($key): bool
+  public function getHelper($name)
   {
-    return isset($this->helpers[$key]);
-  }
-
-  public function offsetGet($key): mixed
-  {
-    return isset($this->helpers[$key])
-      ? $this->helpers[$key]
+    return isset($this->helpers[$name])
+      ? $this->helpers[$name]
       : null;
   }
-  
-  public function offsetSet($key, $val): void {}
-  public function offsetUnset($key): void {}
 }
