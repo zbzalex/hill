@@ -7,7 +7,7 @@ use ArrayObject;
 /**
  * Module class that store all module meta information
  */
-class Module extends ArrayObject
+class Module
 {
   /**
    * @var string $moduleClass Module class
@@ -209,7 +209,7 @@ class Module extends ArrayObject
    * 
    * @return object|null
    */
-  public function offsetGet($providerClass): mixed
+  public function get($providerClass)
   {
     return isset($this->providers[$providerClass])
       ? $this->providers[$providerClass]->instance
