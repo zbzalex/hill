@@ -12,5 +12,5 @@ interface IController
    * 
    * @return array
    */
-  public static function getConfig(): array;
+  public static function getConfig();
 }

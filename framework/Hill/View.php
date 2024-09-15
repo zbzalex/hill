@@ -147,19 +147,19 @@ class View implements \ArrayAccess
       ? $this->helpers[$name]
       : null;
   }
-  public function offsetSet($offset, $value): void {
+  public function offsetSet($offset, $value) {
     // throw new \Exception();
   }
 
-  public function offsetExists($name): bool {
+  public function offsetExists($name) {
     return isset($this->helpers[$name]);
   }
 
-  public function offsetUnset($offset): void {
+  public function offsetUnset($offset) {
     // throw new \Exception();
   }
 
-  public function offsetGet($name): mixed {
+  public function offsetGet($name) {
     return isset($this->helpers[$name])
       ? $this->helpers[$name]
       : null;

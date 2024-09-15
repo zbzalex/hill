@@ -14,5 +14,5 @@ interface IModule
    * 
    * @return array
    */
-  public static function create(array $options = []): array;
+  public static function create(array $options = []);
 }
