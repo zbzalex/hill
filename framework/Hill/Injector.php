@@ -22,6 +22,10 @@ class Injector
     $this->registry = $registry !== null ? $registry : new InstanceRegistry();
   }
 
+  public function get($instanceClass) {
+    return $this->registry->get($instanceClass);
+  }
+
   /**
    * Resolve instance
    * 
