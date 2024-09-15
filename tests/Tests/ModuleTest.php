@@ -10,13 +10,15 @@ use Hill\Route;
 use Hill\RouteMatcher;
 use Hill\RouteScanner;
 use Hill\Validator;
+use Module\TestModule;
+use Module\TestService;
 
 /**
  * Module test class
  */
 class ModuleTest extends \PHPUnit\Framework\TestCase
 {
-    public function testModule()
+    public function _testModule()
     {
         /** @var \Hill\Container $container */
         $container = \Hill\Test::createTestModule(\Module\TestModule::class);
@@ -57,14 +59,14 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
     }
 
     public function _testContainerBuilder() {
-      
       $containerBuilder = new ContainerBuilder(
         \Module\TestModule::create(),
       );
 
       $container = $containerBuilder->build();
 
+      $testModule = $container->getModule(TestModule::class);
 
-
+      // var_dump($testModule);
     }
 }

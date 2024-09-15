@@ -16,6 +16,7 @@ class TestModule implements \Hill\IModule
       ],
       'providers' => [
         TestService::class,
+        Connection::class,
       ],
       'exports' => [
         TestService::class,
