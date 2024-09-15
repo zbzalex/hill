@@ -112,7 +112,6 @@ class Scanner
         if (!isset($providerConfigOrClass['factory'])) continue;
 
         $factory = $providerConfigOrClass['factory'];
-        
       } else {
         if ($providerConfigOrClass === null)
           continue;
@@ -195,27 +194,37 @@ class Scanner
     string $providerClass
   ) {
 
+    var_dump($providerClass);
+    var_dump($exporter->getModuleClass());
+    var_dump($importer->getModuleClass());
+    var_dump([]);
+
     $providers = $exporter->getProviders();
-    if (!isset($providers[$providerClass]))
-      throw new \Exception(sprintf(
-        "Provider '%s' not found in module '%s'",
-        $providerClass,
-        $exporter->getModuleClass(),
-      ));
+    $factory = null;
+    if (isset($providers[$providerClass])) {
 
-    $provider = $providers[$providerClass];
+      // throw new \Exception(sprintf(
+      //   "Provider '%s' not found in module '%s'",
+      //   $providerClass,
+      //   $exporter->getModuleClass(),
+      // ));
 
-    if ($provider->factory === null) {
-      try {
-        $deps = Reflector::getConstructorArgs($providerClass);
+      $provider = $providers[$providerClass];
+      $factory = $provider->factory;
 
-        foreach ($deps as $depProviderClass) {
-          $this->exportProvider($exporter, $importer, $depProviderClass);
+      if ($provider->factory === null) {
+        try {
+          $deps = Reflector::getConstructorArgs($providerClass);
+
+          foreach ($deps as $depProviderClass) {
+            $this->exportProvider($exporter, $importer, $depProviderClass);
+          }
+        } catch (\ReflectionException $e) {
         }
-      } catch (\ReflectionException $e) {
       }
+      
     }
 
-    $importer->addProvider($providerClass, $provider->factory);
+    $importer->addProvider($providerClass, $factory);
   }
 }
