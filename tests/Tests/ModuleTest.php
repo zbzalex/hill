@@ -58,7 +58,7 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
         // }
     }
 
-    public function _testContainerBuilder() {
+    public function testContainerBuilder() {
       $containerBuilder = new ContainerBuilder(
         \Module\TestModule::create(),
       );

@@ -60,7 +60,7 @@ class Injector
         throw new \Exception(
           sprintf("Invalid arguments count in the factory")
         );
-
+      
       // Invokes factory with arguments
       $wrapper->instance = call_user_func_array($wrapper->factory[0], $wrapper->factory[1]);
 
