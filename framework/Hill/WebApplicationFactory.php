@@ -17,10 +17,11 @@ class WebApplicationFactory implements IApplicationFactory
      */
     public static function create($moduleConfigOrClass, array $options = []): IApplication
     {
-        $containerBuilder = new ContainerBuilder($moduleConfigOrClass);
+        $injector = new Injector();
+        $containerBuilder = new ContainerBuilder($moduleConfigOrClass, $injector);
         $container = $containerBuilder->build();
 
-        $app = new WebApplication($container);
+        $app = new WebApplication($container, $injector);
 
         $basePath = isset($options['basePath']) ? $options['basePath'] : '/';
         

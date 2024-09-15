@@ -32,14 +32,18 @@ class WebApplication implements IApplication
    */
   private $errorHandler;
 
+  /** @var Injector $injector */
+  private $injector;
+
   /**
    * Constructor
    * 
    * @param Container $container
    */
-  public function __construct(Container $container)
+  public function __construct(Container $container, Injector $injector)
   {
     $this->container = $container;
+    $this->injector = $injector;
     $this->routeScanner = new RouteScanner($container);
     $this->routes = [];
     $this->errorHandler = function (HttpException $e) {

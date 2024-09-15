@@ -11,16 +11,17 @@ class Scanner
    * @var Container $container Container
    */
   private $container;
+  private $injector;
 
-  public function __construct(Container $container)
+  public function __construct(Container $container, Injector $injector)
   {
     $this->container = $container;
+    $this->injector = $injector;
   }
 
   public function scan($moduleConfigOrClass)
   {
     $this->scanModule($moduleConfigOrClass);
-    $this->resolveModulesImports();
   }
 
   public function resolveModuleConfig($moduleConfigOrClass)
@@ -69,8 +70,8 @@ class Scanner
     if (($module = $this->container->getModule($moduleClass)) !== null) {
       return $module;
     }
-
-    $module = new Module($moduleClass, $moduleConfig);
+    
+    $module = new Module($moduleClass, $moduleConfig, $this->injector);
 
     $this->container->addModule($module);
 
@@ -162,64 +163,5 @@ class Scanner
 
       $module->addImport($importModule);
     }
-  }
-
-  private function resolveModulesImports()
-  {
-    $modules = $this->container->getModules();
-    foreach ($modules as $module) {
-      $imports = $module->getImports();
-      foreach ($imports as $exporter) {
-        $this->export($exporter, $module);
-      }
-    }
-  }
-
-  private function export(Module $exporter, Module $importer)
-  {
-    $importModuleConfig = $exporter->getConfig();
-    $exports = isset($importModuleConfig['exports'])
-      && is_array($importModuleConfig['exports'])
-      ? $importModuleConfig['exports']
-      : [];
-
-    foreach ($exports as $providerClass) {
-      $this->exportProvider($exporter, $importer, $providerClass);
-    }
-  }
-
-  private function exportProvider(
-    Module $exporter,
-    Module $importer,
-    string $providerClass
-  ) {
-
-    $providers = $exporter->getProviders();
-    $factory = null;
-    if (isset($providers[$providerClass])) {
-
-      // throw new \Exception(sprintf(
-      //   "Provider '%s' not found in module '%s'",
-      //   $providerClass,
-      //   $exporter->getModuleClass(),
-      // ));
-
-      $provider = $providers[$providerClass];
-      $factory = $provider->factory;
-
-      if ($provider->factory === null) {
-        try {
-          $deps = Reflector::getConstructorArgs($providerClass);
-
-          foreach ($deps as $depProviderClass) {
-            $this->exportProvider($exporter, $importer, $depProviderClass);
-          }
-        } catch (\ReflectionException $e) {
-        }
-      }
-      
-    }
-
-    $importer->addProvider($providerClass, $factory);
   }
 }

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Hill\ContainerBuilder;
+use Hill\Injector;
 use Hill\Module;
 use Hill\Request;
 use Hill\RequestMethod;
@@ -59,8 +60,12 @@ class ModuleTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testContainerBuilder() {
+      
+      $injector = new Injector();
+
       $containerBuilder = new ContainerBuilder(
         \Module\TestModule::create(),
+        $injector
       );
 
       $container = $containerBuilder->build();

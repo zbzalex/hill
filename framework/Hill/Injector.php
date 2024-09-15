@@ -30,7 +30,7 @@ class Injector
    * 
    * @return object|null
    */
-  public function instantiate(Module $module, InstanceWrapper $wrapper)
+  public function instantiate(array $providers, InstanceWrapper $wrapper)
   {
     // If instance already resolved
     if ($wrapper->instance !== null) {
@@ -70,9 +70,6 @@ class Injector
       return $wrapper->instance;
     }
 
-    // Get providers
-    $providers = $module->getProviders();
-
     try {
       $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
 
@@ -104,21 +101,20 @@ class Injector
 
             // Provider class
             $paramClass = $type->getName();
-
+            
             // Check if provider is not defined
             if (!isset($providers[$paramClass])) {
               throw new \Exception(sprintf(
-                "Unresolved instance '%s' in module '%s'",
+                "Unknown dependency '%s'",
                 $paramClass,
-                $module->getModuleClass()
               ));
             }
 
             // Get need provider by param class
             $provider = $providers[$paramClass];
-
+            
             // Resolve this provider
-            $instance = $this->instantiate($module, $provider);
+            $instance = $this->instantiate($providers, $provider);
 
             // Add a instance into argument list
             $deps[] = $instance;

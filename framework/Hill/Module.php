@@ -44,13 +44,17 @@ class Module
    */
   private $interceptors;
 
+  /** @var Injector $injector */
+  private $injector;
+
   /**
    * Contructor
    * 
    * @param string $moduleClass   Module class
    * @param array  $config        Module config
+   * @param Injector $injector
    */
-  public function __construct($moduleClass, array $config = [])
+  public function __construct($moduleClass, array $config = [], Injector $injector)
   {
     $this->moduleClass = $moduleClass;
     $this->imports = [];
@@ -59,6 +63,7 @@ class Module
     $this->config = $config;
     $this->middlewares = [];
     $this->interceptors = [];
+    $this->injector = $injector;
   }
 
   /**
@@ -131,6 +136,10 @@ class Module
     return $this->interceptors;
   }
 
+  public function getInjector() {
+    return $this->injector;
+  }
+
   /**
    * Puts controller in module
    * 
@@ -200,19 +209,5 @@ class Module
   public function addImport(Module $module)
   {
     $this->imports[$module->getModuleClass()] = $module;
-  }
-
-  /**
-   * Array access by key
-   * 
-   * @param string $providerClass Provider class
-   * 
-   * @return object|null
-   */
-  public function get($providerClass)
-  {
-    return isset($this->providers[$providerClass])
-      ? $this->providers[$providerClass]->instance
-      : null;
   }
 }
