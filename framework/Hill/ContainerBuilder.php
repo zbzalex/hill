@@ -41,7 +41,7 @@ class ContainerBuilder
         
         $modules = $this->container->getModules();
         foreach ($modules as $module) {
-            $this->instanceResolver->instantiateInjectables($module);
+            $this->instanceResolver->resolveModule($module);
         }
 
         return $this->container;

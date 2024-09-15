@@ -8,14 +8,14 @@ namespace Hill;
 class Injector
 {
   /**
-   * @var Registry $registry Class registry
+   * @var InstanceRegistry $registry Class registry
    */
   private $registry;
 
   /**
    * Constructor
    * 
-   * @param Registry $registry Class registry
+   * @param InstanceRegistry $registry Class registry
    */
   public function __construct(InstanceRegistry $registry = null)
   {

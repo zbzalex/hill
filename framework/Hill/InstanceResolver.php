@@ -27,7 +27,7 @@ class InstanceResolver
    * 
    * @param Module $module The module
    */
-  public function instantiateInjectables(Module $module)
+  public function resolveModule(Module $module)
   {
     // Injectable instantances
     $instanceWrappers = array_merge($module->getProviders(), $module->getControllers());
