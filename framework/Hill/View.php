@@ -5,7 +5,7 @@ namespace Hill;
 /**
  * Base view class
  */
-class View
+class View implements \ArrayAccess
 {
   /**
    * @var string $path Views path
@@ -147,4 +147,22 @@ class View
       ? $this->helpers[$name]
       : null;
   }
+  public function offsetSet($offset, $value): void {
+    // throw new \Exception();
+  }
+
+  public function offsetExists($name): bool {
+    return isset($this->helpers[$name]);
+  }
+
+  public function offsetUnset($offset): void {
+    // throw new \Exception();
+  }
+
+  public function offsetGet($name): mixed {
+    return isset($this->helpers[$name])
+      ? $this->helpers[$name]
+      : null;
+  }
+
 }
