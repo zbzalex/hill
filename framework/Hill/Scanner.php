@@ -194,11 +194,6 @@ class Scanner
     string $providerClass
   ) {
 
-    var_dump($providerClass);
-    var_dump($exporter->getModuleClass());
-    var_dump($importer->getModuleClass());
-    var_dump([]);
-
     $providers = $exporter->getProviders();
     $factory = null;
     if (isset($providers[$providerClass])) {
