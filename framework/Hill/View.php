@@ -60,6 +60,12 @@ class View implements \ArrayAccess
     }
   }
 
+  public function setArray(array $arr) {
+    foreach ($arr as $key => $val) {
+      $this->set($key, $val);
+    }
+  }
+
   public function has($key)
   {
     return isset($this->vars[$key]);
