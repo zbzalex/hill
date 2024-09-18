@@ -23,6 +23,11 @@ class Injector
   private $resolving = [];
 
   /**
+   * @var array
+   */
+  private $factories = [];
+
+  /**
    * Constructor
    * 
    * @param InstanceRegistry $registry Class registry
@@ -41,7 +46,17 @@ class Injector
    */
   public function get($instanceClass)
   {
-    return $this->registry->get($instanceClass);
+    $instance = $this->registry->get($instanceClass);
+    if ($instance !== null) {
+      return $instance;
+    }
+    
+    if (isset($this->factories[$instanceClass])) {
+      $factory = $this->factories[$instanceClass];
+      return call_user_func_array($factory[0], $factory[1]);
+    }
+
+    return null;
   }
 
   /**
@@ -101,6 +116,13 @@ class Injector
     $this->resolving[] = $className;
 
     if ($wrapper->factory !== null) {
+
+      if (isset($this->factories[$className])) {
+        $factory = $this->factories[$className];
+
+        return call_user_func_array($factory[0], $factory[1]);
+      }
+
       // Factory must consist of two parts: invokable and invoke arguments
       // [
       //     function($a, $b) { return $a + $b; },
@@ -133,6 +155,11 @@ class Injector
 
       $args[] = $wrapper->factory[1];
       $wrapper->instance = call_user_func_array($wrapper->factory[0], $args);
+
+      $this->factories[$className] = [
+        $wrapper->factory[0],
+        $args,
+      ];
 
       $this->resolving = array_diff($this->resolving, [
         $className
