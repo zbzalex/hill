@@ -143,12 +143,20 @@ class Injector
 
     if ($wrapper->instance !== null) {
 
+      $this->resolving = array_diff($this->resolving, [
+        $className
+      ]);
+
       return $wrapper->instance;
     }
 
     if (($instance = $this->registry->get($wrapper->instanceClass)) !== null) {
 
       $wrapper->instance = $instance;
+
+      $this->resolving = array_diff($this->resolving, [
+        $className
+      ]);
 
       return $wrapper->instance;
     }
