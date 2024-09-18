@@ -135,12 +135,12 @@ class Scanner
         )
           continue;
 
-        if (isset($providerConfigOfClass['provider'])) {
-          if (!is_array($providerConfigOfClass['provider'])
-          || count($providerConfigOfClass['provider']) < 2)
+        if (isset($providerConfigOrClass['provider'])) {
+          if (!is_array($providerConfigOrClass['provider'])
+          || count($providerConfigOrClass['provider']) < 2)
             continue;
           
-          $provider = $providerConfigOfClass['provider'];
+          $provider = $providerConfigOrClass['provider'];
         } else if (isset($providerConfigOrClass['factory'])) {
           if (
             !is_array($providerConfigOrClass['factory'])
@@ -151,8 +151,8 @@ class Scanner
           $factory = $providerConfigOrClass['factory'];
         }
 
-        if (isset($providerConfigOfClass['deps'])) {
-          $deps = $providerConfigOfClass['deps'];
+        if (isset($providerConfigOrClass['deps'])) {
+          $deps = $providerConfigOrClass['deps'];
         }
       } else {
         if ($providerConfigOrClass === null)
