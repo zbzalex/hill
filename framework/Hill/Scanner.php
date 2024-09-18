@@ -8,22 +8,38 @@ namespace Hill;
 class Scanner
 {
   /**
-   * @var Container $container Container
+   * @var Container
    */
   private $container;
+
+  /**
+   * @var Injector
+   */
   private $injector;
 
+  /**
+   * Constructor
+   * 
+   * @param Container $container  Module container
+   * @param Injector $injector    Class injector
+   */
   public function __construct(Container $container, Injector $injector)
   {
     $this->container = $container;
     $this->injector = $injector;
   }
 
+  /**
+   * Scan module
+   */
   public function scan($moduleConfigOrClass)
   {
     $this->scanModule($moduleConfigOrClass);
   }
 
+  /**
+   * Resolve module config
+   */
   public function resolveModuleConfig($moduleConfigOrClass)
   {
     if (is_array($moduleConfigOrClass)) {
@@ -70,7 +86,7 @@ class Scanner
     if (($module = $this->container->getModule($moduleClass)) !== null) {
       return $module;
     }
-    
+
     $module = new Module($moduleClass, $moduleConfig, $this->injector);
 
     $this->container->addModule($module);
@@ -100,6 +116,9 @@ class Scanner
   private function addProviders(Module $module, array $providers)
   {
     foreach ($providers as $providerConfigOrClass) {
+
+      $providerFn = null;
+      $deps = [];
       $factory = null;
 
       if (is_array($providerConfigOrClass)) {
@@ -110,9 +129,30 @@ class Scanner
         if ($providerClass === null)
           continue;
 
-        if (!isset($providerConfigOrClass['factory'])) continue;
+        if (
+          !isset($providerConfigOrClass['fn'])
+          && !isset($providerConfigOrClass['factory'])
+        )
+          continue;
 
-        $factory = $providerConfigOrClass['factory'];
+        if (isset($providerConfigOfClass['fn'])) {
+          if (!is_callable($providerConfigOfClass['fn']))
+            continue;
+
+          $providerFn = $providerConfigOfClass['fn'];
+        } else if (isset($providerConfigOrClass['factory'])) {
+          if (
+            !is_array($providerConfigOrClass['factory'])
+            || count($providerConfigOrClass['factory']) < 2
+          )
+            continue;
+
+          $factory = $providerConfigOrClass['factory'];
+        }
+
+        if (isset($providerConfigOfClass['deps'])) {
+          $deps = $providerConfigOfClass['deps'];
+        }
       } else {
         if ($providerConfigOrClass === null)
           continue;
@@ -120,7 +160,9 @@ class Scanner
         $providerClass = $providerConfigOrClass;
       }
 
-      $module->addProvider($providerClass, $factory);
+      $wrapper = $module->addProvider($providerClass, $factory);
+      $wrapper->providerFn  = $providerFn;
+      $wrapper->deps        = $deps;
     }
   }
 

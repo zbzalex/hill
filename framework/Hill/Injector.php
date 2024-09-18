@@ -8,9 +8,19 @@ namespace Hill;
 class Injector
 {
   /**
-   * @var InstanceRegistry $registry Class registry
+   * @var InstanceRegistry
    */
   private $registry;
+
+  /**
+   * @var array
+   */
+  private $dependencyGraph = [];
+
+  /**
+   * @var array
+   */
+  private $resolving = [];
 
   /**
    * Constructor
@@ -22,8 +32,55 @@ class Injector
     $this->registry = $registry !== null ? $registry : new InstanceRegistry();
   }
 
-  public function get($instanceClass) {
+  /**
+   * Get instance by class name if exists
+   * 
+   * @param string $instanceClass
+   * 
+   * @return object|null
+   */
+  public function get($instanceClass)
+  {
     return $this->registry->get($instanceClass);
+  }
+
+  /**
+   * Build dependency graph for a class name
+   * 
+   * @param string  $className  Class name
+   * @param array   $map        Map of dependencies
+   */
+  private function buildDependencyGraph($className, array $map = [])
+  {
+    if (isset($this->dependencyGraph[$className])) {
+      return;
+    }
+
+    $this->dependencyGraph[$className] = [];
+
+    try {
+      $reflectionClass = new \ReflectionClass($className);
+      $constructor = $reflectionClass->getConstructor();
+
+      if ($constructor !== null) {
+
+        $constructorParams = $constructor->getParameters();
+
+        foreach ($constructorParams as $param) {
+          $paramType = $param->getType();
+          if ($paramType === null) break;
+
+          $dependencyClass = $paramType->getName();
+
+          $this->buildDependencyGraph($dependencyClass, $map);
+
+          $this->dependencyGraph[$className][] = $dependencyClass;
+        }
+      } else {
+        $this->dependencyGraph[$className] = [];
+      }
+    } catch (\ReflectionException $e) {
+    }
   }
 
   /**
@@ -34,23 +91,15 @@ class Injector
    * 
    * @return object|null
    */
-  public function instantiate(array $providers, InstanceWrapper $wrapper)
+  public function instantiate(array $map, InstanceWrapper $wrapper)
   {
-    // If instance already resolved
-    if ($wrapper->instance !== null) {
-      return $wrapper->instance;
-    }
+    $className = $wrapper->instanceClass;
 
-    // If instance already resolved and registered but that wrapper is not be set.
-    if (($instance = $this->registry->get($wrapper->instanceClass)) !== null) {
+    if (in_array($className, $this->resolving))
+      throw new \Exception('Circular dependency detected for class: ' . $className);
 
-      // Sets reference to object
-      $wrapper->instance = $instance;
+    $this->resolving[] = $className;
 
-      return $wrapper->instance;
-    }
-
-    // If wrapper is factory
     if ($wrapper->factory !== null) {
       // Factory must consist of two parts: invokable and invoke arguments
       // [
@@ -60,86 +109,86 @@ class Injector
       //         2
       //     ]
       // ]
-      if (count($wrapper->factory) != 2)
+      if (count($wrapper->factory) < 2)
         throw new \Exception(
-          sprintf("Invalid arguments count in the factory")
+          sprintf("Factory requires 2 arguments!")
         );
-      
-      // Invokes factory with arguments
-      $wrapper->instance = call_user_func_array($wrapper->factory[0], $wrapper->factory[1]);
 
-      // Register resolved instance
-      $this->registry->set($wrapper->instanceClass, $wrapper->instance);
+      $deps = $wrapper->deps;
+      $args = [];
 
-      return $wrapper->instance;
-    }
-
-    try {
-      $reflectionClass = new \ReflectionClass($wrapper->instanceClass);
-
-      // Get injectable constructor
-      $constructor = $reflectionClass->getConstructor();
-      if ($constructor !== null) {
-
-        // Get parameters
-        $constructorParams = $constructor->getParameters();
-
-        // Check if count of parameters is equal zero
-        if (count($constructorParams) == 0) {
-          // Instantiate a new object without parameters
-          $wrapper->instance = $reflectionClass->newInstance();
-        } else {
-
-          // Argument list for class instantiation
-          $deps = [];
-
-          // Enumerate each of parameters
-          foreach ($constructorParams as $param) {
-
-            // Get param type
-            /** @var \ReflectionNamedType $type */
-            $type = $param->getType();
-
-            if ($type === null)
-              break;
-
-            // Provider class
-            $paramClass = $type->getName();
-            
-            // Check if provider is not defined
-            if (!isset($providers[$paramClass])) {
-              throw new \Exception(sprintf(
-                "Unknown dependency '%s'",
-                $paramClass,
-              ));
-            }
-
-            // Get need provider by param class
-            $provider = $providers[$paramClass];
-            
-            // Resolve this provider
-            $instance = $this->instantiate($providers, $provider);
-
-            // Add a instance into argument list
-            $deps[] = $instance;
-          }
-
-          // Instantiate a new object with arguments and set into wrapper
-          $wrapper->instance = $reflectionClass->newInstanceArgs($deps);
+      foreach ($deps as $dependencyClass) {
+        if (!isset($map[$dependencyClass])) {
+          throw new \Exception(sprintf(
+            "Can't resolve dependency '%s' for a class '%s'",
+            $dependencyClass,
+            $className,
+          ));
         }
-      } else {
-        // Instantiate a new object without contructor
-        $wrapper->instance = $reflectionClass->newInstanceWithoutConstructor();
+
+        $dependencyWrapper = $map[$dependencyClass];
+        $instance = $this->instantiate($map, $dependencyWrapper);
+        $args[] = $instance;
       }
 
-      // Register resolved instance
-      $this->registry->set($wrapper->instanceClass, $wrapper->instance);
+      $args[] = $wrapper->factory[1];
+      $wrapper->instance = call_user_func_array($wrapper->factory[0], $args);
+
+      $this->resolving = array_diff($this->resolving, [
+        $className
+      ]);
 
       return $wrapper->instance;
-    } catch (\ReflectionException $e) {
-      // ignore
     }
 
-    return null;
+    if ($wrapper->instance !== null) {
+
+      return $wrapper->instance;
+    }
+
+    if (($instance = $this->registry->get($wrapper->instanceClass)) !== null) {
+
+      $wrapper->instance = $instance;
+
+      return $wrapper->instance;
+    }
+
+    if ($wrapper->providerFn === null) {
+      $this->buildDependencyGraph($className, $map);
+    }
+
+    $deps = $wrapper->providerFn === null
+      ? $this->dependencyGraph[$className]
+      : $wrapper->deps;
+    $args = [];
+
+    foreach ($deps as $dependencyClass) {
+      if (!isset($map[$dependencyClass])) {
+        throw new \Exception(sprintf(
+          "Can't resolve dependency '%s' for a class '%s'",
+          $dependencyClass,
+          $className,
+        ));
+      }
+
+      $dependencyWrapper = $map[$dependencyClass];
+      $instance = $this->instantiate($map, $dependencyWrapper);
+      $args[] = $instance;
+    }
+
+    if ($wrapper->providerFn === null) {
+      $instance = Reflector::instantiate($className, $args);
+    } else {
+      $instance = call_user_func_array($wrapper->providerFn, $args);
+    }
+
+    $wrapper->instance = $instance;
+    $this->registry->set($className, $wrapper->instance);
+
+    $this->resolving = array_diff($this->resolving, [
+      $className
+    ]);
+
+    return $instance;
   }
 }

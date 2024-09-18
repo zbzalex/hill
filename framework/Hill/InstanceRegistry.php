@@ -8,7 +8,7 @@ namespace Hill;
 class InstanceRegistry
 {
   /**
-   * @var object[] $instances
+   * @var object[]
    */
   private $instances;
 
@@ -21,7 +21,7 @@ class InstanceRegistry
   }
 
   /**
-   * Get instance
+   * Get instance by class name if exists
    * 
    * @param string $instanceClass
    * 
@@ -33,7 +33,7 @@ class InstanceRegistry
       ? $this->instances[$instanceClass]
       : null;
   }
-
+  
   /**
    * Set instance
    * 

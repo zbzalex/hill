@@ -36,26 +36,28 @@ class ContainerBuilder
    */
   public function build()
   {
-    // scan module for dependencies
     $this->scanner->scan($this->moduleConfigOrClass);
 
     $modules = $this->container->getModules();
-    $providers = [];
+
+    $map = [];
 
     foreach ($modules as $module) {
       foreach ($module->getProviders() as $provider) {
-        $providers[$provider->instanceClass] = $provider;
+        $map[$provider->instanceClass] = $provider;
       }
     }
 
     foreach ($modules as $module) {
       foreach ($module->getControllers() as $controller) {
-        $providers[$controller->instanceClass] = $controller;
+        $map[$controller->instanceClass] = $controller;
       }
     }
 
-    foreach ($providers as $provider) {
-      $this->injector->instantiate($providers, $provider);
+    foreach ($map as $providerClass => $provider) {
+
+      $this->injector->instantiate($map, $provider);
+      
     }
 
     return $this->container;

@@ -86,4 +86,32 @@ class Reflector
 
     return null;
   }
+
+  public static function instantiate($class, array $args = [])
+  {
+    try {
+
+      $reflectionClass = new \ReflectionClass($class);
+      $constructor = $reflectionClass->getConstructor();
+
+      if ($constructor !== null) {
+
+        $constructorParams = $constructor->getParameters();
+
+        if (count($constructorParams) == 0) {
+          return $reflectionClass->newInstance();
+        }
+
+        return $reflectionClass->newInstanceArgs($args);
+        
+      }
+
+      return $reflectionClass->newInstanceWithoutConstructor();
+
+    } catch (\ReflectionException $e) {
+      // ignore
+    }
+
+    return null;
+  }
 }

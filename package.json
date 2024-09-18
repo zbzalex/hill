@@ -1,0 +1,14 @@
+{
+  "name": "hill",
+  "version": "1.0.0",
+  "description": "The Hill Framework",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php ./tests"
+  },
+  "author": "",
+  "license": "ISC"
+}

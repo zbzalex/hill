@@ -8,12 +8,12 @@ namespace Hill;
 class RouteScanner
 {
   /**
-   * @var Container $container
+   * @var Container
    */
   private $container;
 
   /**
-   * @var Route[] $routes
+   * @var Route[]
    */
   private $routes;
 

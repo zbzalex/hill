@@ -8,19 +8,29 @@ namespace Hill;
 class InstanceWrapper
 {
   /**
-   * @var string $instanceClass
+   * @var string
    */
   public $instanceClass;
 
   /**
-   * @var object|null $instance
+   * @var object|null
    */
   public $instance;
 
   /**
-   * @var array|null $factory
+   * @var array|null
    */
   public $factory;
+
+  /**
+   * @var callable
+   */
+  public $providerFn = null;
+
+  /**
+   * @var string[]
+   */
+  public $deps = [];
 
   /**
    * Constructor
