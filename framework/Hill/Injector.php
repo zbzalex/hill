@@ -120,6 +120,10 @@ class Injector
       if (isset($this->factories[$className])) {
         $factory = $this->factories[$className];
 
+        $this->resolving = array_diff($this->resolving, [
+          $className
+        ]);
+
         return call_user_func_array($factory[0], $factory[1]);
       }
 
