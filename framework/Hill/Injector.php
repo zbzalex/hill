@@ -192,11 +192,11 @@ class Injector
       return $wrapper->instance;
     }
 
-    if ($wrapper->providerFn === null) {
+    if ($wrapper->provider === null) {
       $this->buildDependencyGraph($className, $map);
     }
 
-    $deps = $wrapper->providerFn === null
+    $deps = $wrapper->provider === null
       ? $this->dependencyGraph[$className]
       : $wrapper->deps;
     $args = [];
@@ -215,10 +215,13 @@ class Injector
       $args[] = $instance;
     }
 
-    if ($wrapper->providerFn === null) {
+    if ($wrapper->provider === null) {
       $instance = Reflector::instantiate($className, $args);
     } else {
-      $instance = call_user_func_array($wrapper->providerFn, $args);
+      
+      $args[] = $wrapper->provider[1];
+
+      $instance = call_user_func_array($wrapper->provider[0], $args);
     }
 
     $wrapper->instance = $instance;

@@ -17,7 +17,7 @@ class InjectorTest extends TestCase
     $wrapper1 = new InstanceWrapper(Service1::class);
     $wrapper2 = new InstanceWrapper(Service2::class);
     $wrapper2->factory = [
-      function(Connection $connection, $args) {
+      function (Connection $connection, $args) {
         var_dump($connection);
         var_dump($args);
         return new Service2();
@@ -37,9 +37,9 @@ class InjectorTest extends TestCase
     $wrapper4 = new InstanceWrapper(Connection::class);
 
     $wrapper3->instanceClass = Service3::class;
-    $wrapper3->providerFn = function ($conn) {
+    $wrapper3->provider = [function ($conn) {
       return new Service3(1, $conn);
-    };
+    }, []];
     $wrapper3->deps = [
       Connection::class,
     ];

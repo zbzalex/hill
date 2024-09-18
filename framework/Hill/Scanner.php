@@ -117,7 +117,7 @@ class Scanner
   {
     foreach ($providers as $providerConfigOrClass) {
 
-      $providerFn = null;
+      $provider = null;
       $deps = [];
       $factory = null;
 
@@ -130,16 +130,17 @@ class Scanner
           continue;
 
         if (
-          !isset($providerConfigOrClass['fn'])
+          !isset($providerConfigOrClass['provider'])
           && !isset($providerConfigOrClass['factory'])
         )
           continue;
 
-        if (isset($providerConfigOfClass['fn'])) {
-          if (!is_callable($providerConfigOfClass['fn']))
+        if (isset($providerConfigOfClass['provider'])) {
+          if (!is_array($providerConfigOfClass['provider'])
+          || count($providerConfigOfClass['provider']) < 2)
             continue;
-
-          $providerFn = $providerConfigOfClass['fn'];
+          
+          $provider = $providerConfigOfClass['provider'];
         } else if (isset($providerConfigOrClass['factory'])) {
           if (
             !is_array($providerConfigOrClass['factory'])
@@ -161,7 +162,7 @@ class Scanner
       }
 
       $wrapper = $module->addProvider($providerClass, $factory);
-      $wrapper->providerFn  = $providerFn;
+      $wrapper->provider    = $provider;
       $wrapper->deps        = $deps;
     }
   }

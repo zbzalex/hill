@@ -25,7 +25,7 @@ class InstanceWrapper
   /**
    * @var callable
    */
-  public $providerFn = null;
+  public $provider = null;
 
   /**
    * @var string[]
