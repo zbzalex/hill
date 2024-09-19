@@ -1,6 +1,7 @@
 {
     "name": "zbzalex/hill",
     "type": "library",
+    "version": "1.0.0",
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
