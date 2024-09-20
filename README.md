@@ -42,7 +42,7 @@ class AppModule implements IModule {
               $options,
             ],
           ],
-          'deps' => [
+          'inject' => [
             SomeDependency::class,
           ],
         ]
@@ -120,3 +120,14 @@ $app = new WebApplicationFactory(AppModule::class, [
 
 $app->run();
 ```
+
+Requirements
+------------
+
+PHP >= 7.4
+PDO
+
+License
+-------
+
+Neon is licensed under the ISC license.
