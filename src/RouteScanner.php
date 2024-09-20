@@ -77,19 +77,19 @@ class RouteScanner
         $path = rtrim($path, "/");
       }
 
+      $mapSubscribedEvents = $subscribedEvents;
+      
       foreach (
         $map->subscribedEvents as $eventName => $listeners
       ) {
-
-        $subscribedEvents[$eventName] =
-          isset($subscribedEvents[$eventName])
-          ? $subscribedEvents[$eventName]
+        $mapSubscribedEvents[$eventName] =
+          isset($mapSubscribedEvents[$eventName])
+          ? $mapSubscribedEvents[$eventName]
           : [];
 
         foreach ($listeners as $listener) {
-          $subscribedEvents[$eventName][] = $listener;
+          $mapSubscribedEvents[$eventName][] = $listener;
         }
-        
       }
 
       $route = new Route(
@@ -100,7 +100,7 @@ class RouteScanner
           $wrapper->instance,
           $map->action
         ],
-        $subscribedEvents
+        $mapSubscribedEvents
       );
 
       // compile pattern
