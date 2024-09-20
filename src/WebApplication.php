@@ -29,27 +29,18 @@ class WebApplication implements IApplication
   public function __construct(
     Container $container,
     Injector $injector,
-    EventDispatcher $dispatcher = null,
-    $errorHandler = null
+    EventDispatcher $dispatcher = null
   ) {
     $this->container = $container;
     $this->injector = $injector;
     $this->routeScanner = new RouteScanner($container);
     $this->routes = [];
-    $this->errorHandler = $errorHandler !== null
-      ? $errorHandler
-      : $this->_getDefaultErrorHandler();
     $this->dispatcher = $dispatcher;
   }
 
   public function setBasePath($path)
   {
     $this->basePath = $path;
-  }
-
-  public function setErrorHandler($handler)
-  {
-    $this->errorHandler = $handler;
   }
 
   public function getEventDispatcher(): EventDispatcher
@@ -61,16 +52,6 @@ class WebApplication implements IApplication
   {
     $this->_scan();
     $this->_init();
-  }
-
-  private function _getDefaultErrorHandler()
-  {
-    return function (HttpException $e) {
-      $response = new Response(null);
-
-      $response->setStatusCode($e->getCode());
-      return $response;
-    };
   }
 
   private function _scan()
