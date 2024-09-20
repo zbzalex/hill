@@ -24,7 +24,7 @@ class InstanceWrapper
   /**
    * @var string[]
    */
-  public $deps = [];
+  public $inject = [];
 
   public function __construct($instanceClass, $factory = null)
   {

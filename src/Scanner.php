@@ -107,9 +107,8 @@ class Scanner
   private function addProviders(Module $module, array $providers)
   {
     foreach ($providers as $providerConfigOrClass) {
-
       $provider = null;
-      $deps = [];
+      $inject = [];
       $factory = null;
 
       if (is_array($providerConfigOrClass)) {
@@ -142,8 +141,8 @@ class Scanner
           $factory = $providerConfigOrClass['factory'];
         }
 
-        if (isset($providerConfigOrClass['deps'])) {
-          $deps = $providerConfigOrClass['deps'];
+        if (isset($providerConfigOrClass['inject'])) {
+          $inject = $providerConfigOrClass['inject'];
         }
       } else {
         if ($providerConfigOrClass === null)
@@ -154,7 +153,7 @@ class Scanner
 
       $wrapper = $module->addProvider($providerClass, $factory);
       $wrapper->provider    = $provider;
-      $wrapper->deps        = $deps;
+      $wrapper->inject      = $inject;
     }
   }
 

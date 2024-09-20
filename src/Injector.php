@@ -132,10 +132,10 @@ class Injector
           sprintf("Factory requires 2 arguments!")
         );
 
-      $deps = $wrapper->deps;
+      $dependencies = $wrapper->inject;
       $args = [];
 
-      foreach ($deps as $dependencyClass) {
+      foreach ($dependencies as $dependencyClass) {
         if (!isset($map[$dependencyClass])) {
           throw new \Exception(sprintf(
             "Can't resolve dependency '%s' for a class '%s'",
@@ -188,12 +188,12 @@ class Injector
       $this->buildDependencyGraph($className, $map);
     }
 
-    $deps = $wrapper->provider === null
+    $dependencies = $wrapper->provider === null
       ? $this->dependencyGraph[$className]
-      : $wrapper->deps;
+      : $wrapper->inject;
     $args = [];
 
-    foreach ($deps as $dependencyClass) {
+    foreach ($dependencies as $dependencyClass) {
       if (!isset($map[$dependencyClass])) {
         throw new \Exception(sprintf(
           "Can't resolve dependency '%s' for a class '%s'",
