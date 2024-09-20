@@ -3,7 +3,10 @@
 namespace Tests;
 
 use Neon\Events;
+use Neon\FilterResponseEvent;
+use Neon\GetResponseEvent;
 use Neon\IController;
+use Neon\LifecycleEvents;
 use Neon\OnRequestEvent;
 use Neon\OnResponseEvent;
 use Neon\RequestEvent;
@@ -19,24 +22,26 @@ class TestController implements IController
       'path' => '/',
       'mapping' => [
         new RequestMapping('GET', '/', '_index', [
-          Events::REQUEST => [
-            function() {
-              echo "call request.event from route\n";
+          LifecycleEvents::REQUEST => [
+            function(GetResponseEvent $event) {
+              echo "received GetResponseEvent from route\n";
+
             }
           ],
         ]),
       ],
-      'events' => [
-        Events::REQUEST => [
-          function (OnRequestEvent $event) {
-            echo "call request.event from controller";
-            $event->stopPropagation();
-            $event->setResponse(new Response("hello from controller listener"));
+      'subscribedEvents' => [
+        LifecycleEvents::REQUEST => [
+          function (GetResponseEvent $event) {
+
+            echo "received GetResponseEvent from controller\n";
+            // $event->stopPropagation();
+            // $event->setResponse(new Response("hello from controller listener"));
           },
         ],
-        Events::RESPONSE => [
-          function (OnResponseEvent $event) {
-            echo "call response.event from controller";
+        LifecycleEvents::RESPONSE => [
+          function (FilterResponseEvent $event) {
+            echo "received FilterResponseEvent from controller\n";
           }
         ],
       ],

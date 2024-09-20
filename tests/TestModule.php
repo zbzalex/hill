@@ -17,6 +17,6 @@ class TestModule implements IModule, IOnModuleInit {
   }
 
   public static function onInit(Injector $injector) {
-    echo "module initialized";
+    echo "module initialized\n";
   }
 }

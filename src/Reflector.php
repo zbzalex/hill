@@ -4,10 +4,10 @@ namespace Neon;
 
 class Reflector
 {
-  public static function getConstructorArgs($someClass)
+  public static function getConstructorArgs($className)
   {
     try {
-      $reflectionClass = new \ReflectionClass($someClass);
+      $reflectionClass = new \ReflectionClass($className);
 
       $constructor = $reflectionClass->getConstructor();
       if ($constructor !== null) {

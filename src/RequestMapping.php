@@ -22,17 +22,17 @@ class RequestMapping
   /**
    * @var array
    */
-  public $events;
+  public $subscribedEvents;
 
   public function __construct(
     $requestMethod,
     $path,
     $action,
-    array $events = []
+    array $subscribedEvents = []
   ) {
     $this->requestMethod = $requestMethod;
     $this->path = $path;
     $this->action = $action;
-    $this->events = $events;
+    $this->subscribedEvents = $subscribedEvents;
   }
 }

@@ -37,21 +37,21 @@ class Route
   /**
    * @var array
    */
-  private $events;
+  private $subscribedEvents;
 
   public function __construct(
     Module $module,
     $requestMethod,
     $path,
     $controller = null,
-    array $events = []
+    array $subscribedEvents = []
   ) {
     $this->module = $module;
     $this->requestMethod = $requestMethod;
     $this->path = $path;
     $this->controller = $controller;
     $this->args = [];
-    $this->events = $events;
+    $this->subscribedEvents = $subscribedEvents;
   }
 
   public function compile()
@@ -117,8 +117,8 @@ class Route
     return $this->args;
   }
 
-  public function getEvents()
+  public function getSubscribedEvents()
   {
-    return $this->events;
+    return $this->subscribedEvents;
   }
 }

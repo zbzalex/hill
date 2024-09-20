@@ -1,1 +1,1 @@
-C:30:"PHPUnit\Runner\TestResultCache":228:{a:2:{s:7:"defects";a:2:{s:32:"Tests\InjectorTest::testInjector";i:5;s:32:"Tests\TestModuleTest::testModule";i:5;}s:5:"times";a:2:{s:32:"Tests\InjectorTest::testInjector";d:0.001;s:32:"Tests\TestModuleTest::testModule";d:0.004;}}}
+C:30:"PHPUnit\Runner\TestResultCache":228:{a:2:{s:7:"defects";a:2:{s:32:"Tests\InjectorTest::testInjector";i:5;s:32:"Tests\TestModuleTest::testModule";i:5;}s:5:"times";a:2:{s:32:"Tests\InjectorTest::testInjector";d:0.001;s:32:"Tests\TestModuleTest::testModule";d:0.011;}}}

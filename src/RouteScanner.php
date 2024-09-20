@@ -41,8 +41,8 @@ class RouteScanner
           $mapping = isset($config['mapping'])
             ? $config['mapping']
             : [];
-          $events = isset($config['events'])
-            ? $config['events']
+          $subscribedEvents = isset($config['subscribedEvents'])
+            ? $config['subscribedEvents']
             : [];
 
           $path = rtrim($basePath . $controllerBasePath, "/") . "/";
@@ -52,7 +52,7 @@ class RouteScanner
             $wrapper,
             $path,
             $mapping,
-            $events
+            $subscribedEvents
           );
         } catch (\ReflectionException $e) {
         }
@@ -67,7 +67,7 @@ class RouteScanner
     $wrapper,
     $basePath,
     array $mapping,
-    array $events
+    array $subscribedEvents
   ) {
     foreach ($mapping as $map) {
       /** @var RequestMapping $map */
@@ -78,16 +78,16 @@ class RouteScanner
       }
 
       foreach (
-        $map->events as $eventName => $listeners
+        $map->subscribedEvents as $eventName => $listeners
       ) {
 
-        $events[$eventName] =
-          isset($events[$eventName])
-          ? $events[$eventName]
+        $subscribedEvents[$eventName] =
+          isset($subscribedEvents[$eventName])
+          ? $subscribedEvents[$eventName]
           : [];
 
         foreach ($listeners as $listener) {
-          $events[$eventName][] = $listener;
+          $subscribedEvents[$eventName][] = $listener;
         }
         
       }
@@ -100,7 +100,7 @@ class RouteScanner
           $wrapper->instance,
           $map->action
         ],
-        $events
+        $subscribedEvents
       );
 
       // compile pattern

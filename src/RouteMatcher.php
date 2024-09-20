@@ -18,6 +18,8 @@ class RouteMatcher
 
   public function match(Request $request)
   {
+    $path = rtrim($request->getPathInfo(), '/') . '/';
+    
     foreach ($this->routes as $route) {
       if (strpos($route->getRequestMethod(), "|") !== 1) {
         $methods = array_map(function ($method) {
@@ -31,7 +33,7 @@ class RouteMatcher
         continue;
       }
 
-      if (!preg_match($route->getCompiledPath(), $request->getPathInfo(), $matches))
+      if (!preg_match($route->getCompiledPath(), $path, $matches))
         continue;
 
       if (count($route->getArgs()) != 0) {
