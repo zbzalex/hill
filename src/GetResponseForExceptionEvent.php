@@ -12,7 +12,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
   {
     $this->exception = $exception;
     
-    parent::__construct($injector, $request);
+    parent::__construct($request, $injector);
   }
 
   public function getException(): \Exception
