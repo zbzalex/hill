@@ -106,8 +106,8 @@ class Request
   public static function createFromGlobals()
   {
     return self::create(
-      $_SERVER['REQUEST_METHOD'],
       rtrim(str_replace('@', '%40', $_SERVER['REQUEST_URI']), "/") . "/",
+      $_SERVER['REQUEST_METHOD'],
       self::resolveGlobalHeaders(),
       $_GET,
       $_POST,
@@ -128,7 +128,7 @@ class Request
   {
     return new Request(
       $method,
-      rtrim(str_replace('@', '%40', $path), "/") . "/",
+      $path,
       $headers,
       $query,
       $request,
