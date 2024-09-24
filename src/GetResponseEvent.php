@@ -2,8 +2,6 @@
 
 namespace Neon;
 
-use Symfony\Component\HttpFoundation\Response;
-
 class GetResponseEvent extends GenesisEvent
 {
   protected $response;

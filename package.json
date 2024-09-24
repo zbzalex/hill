@@ -1,7 +1,7 @@
 {
-  "name": "hill",
+  "name": "neon",
   "version": "1.0.0",
-  "description": "The Hill Framework",
+  "description": "Neon Framework",
   "main": "index.js",
   "directories": {
     "test": "tests"

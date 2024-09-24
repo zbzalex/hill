@@ -1,7 +1,7 @@
 Neon Framework
 ===================
 
-The Neon is a toy set up over Symfony framework for comfortable creating your ideas.
+The Neon is a simple framework without dependencies.
 
 Getting Started
 ---------------

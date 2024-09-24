@@ -12,7 +12,6 @@ use Neon\OnResponseEvent;
 use Neon\RequestEvent;
 use Neon\RequestMapping;
 use Neon\ResponseEvent;
-use Symfony\Component\HttpFoundation\Response;
 
 class TestController implements IController
 {
@@ -25,7 +24,6 @@ class TestController implements IController
           LifecycleEvents::REQUEST => [
             function(GetResponseEvent $event) {
               echo "received GetResponseEvent from route\n";
-
             }
           ],
         ]),

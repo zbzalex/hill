@@ -2,8 +2,6 @@
 
 namespace Neon;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 class WebApplicationFactory implements IApplicationFactory
 {
   public static function create($moduleConfigOrClass, array $options = []): IApplication

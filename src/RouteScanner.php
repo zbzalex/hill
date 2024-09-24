@@ -46,7 +46,7 @@ class RouteScanner
             : [];
 
           $path = rtrim($basePath . $controllerBasePath, "/") . "/";
-
+          
           $this->registerRoutes(
             $module,
             $wrapper,
@@ -69,6 +69,7 @@ class RouteScanner
     array $mapping,
     array $subscribedEvents
   ) {
+
     foreach ($mapping as $map) {
       /** @var RequestMapping $map */
 
@@ -77,18 +78,18 @@ class RouteScanner
         $path = rtrim($path, "/");
       }
 
-      $mapSubscribedEvents = $subscribedEvents;
-      
+      $sub = $subscribedEvents;
+
       foreach (
         $map->subscribedEvents as $eventName => $listeners
       ) {
-        $mapSubscribedEvents[$eventName] =
-          isset($mapSubscribedEvents[$eventName])
-          ? $mapSubscribedEvents[$eventName]
+
+        $sub[$eventName] = isset($sub[$eventName])
+          ? $sub[$eventName]
           : [];
 
         foreach ($listeners as $listener) {
-          $mapSubscribedEvents[$eventName][] = $listener;
+          $sub[$eventName][] = $listener;
         }
       }
 
@@ -100,9 +101,9 @@ class RouteScanner
           $wrapper->instance,
           $map->action
         ],
-        $mapSubscribedEvents
+        $sub
       );
-
+      
       // compile pattern
       $route->compile();
 

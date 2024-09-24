@@ -2,8 +2,6 @@
 
 namespace Neon;
 
-use Symfony\Component\HttpFoundation\Request;
-
 class GetResponseForExceptionEvent extends GetResponseEvent
 {
   protected $exception;

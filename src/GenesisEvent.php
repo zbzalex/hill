@@ -2,9 +2,6 @@
 
 namespace Neon;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-
 class GenesisEvent extends Event
 {
   protected $request;

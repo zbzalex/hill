@@ -2,10 +2,6 @@
 
 namespace Neon;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
 class WebApplication implements IApplication
 {
   private Container $container;

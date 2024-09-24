@@ -2,11 +2,6 @@
 
 namespace Neon;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
 class RequestHandler
 {
   private $matcher;
@@ -33,7 +28,7 @@ class RequestHandler
       $route = $this->matcher->match($request);
       if ($route === null)
         throw new HttpException("Not Found", 404);
-      
+                  
       foreach (
         $route->getSubscribedEvents() as $eventName => $listeners
       ) {
